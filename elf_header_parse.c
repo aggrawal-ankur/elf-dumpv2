@@ -2,17 +2,16 @@
 #include <stdlib.h>
 #include <string.h>
 #include <elf.h>
-#include "elf_parser.h"
+#include "elf_header_parse.h"
 
 int parse_elf(FILE* file_object){
 
-  // Data type for elf_header struct, coming from the elf.h file 
+  // Data type for elf_header struct, coming from the elf.h file
   Elf64_Ehdr elf_header;
 
   // Reading the first 64-bytes directly into our elf_header struct
-  // fread()'s signature is as follows: 
   if (fread(&elf_header, 1, sizeof(Elf64_Ehdr), file_object) != sizeof(Elf64_Ehdr)) {
-    perror("Error: Not a valid ELF! `fread()`\n");
+    fprintf(stderr, "Error: `fread()`: Not a valid ELF! Unexpected bytes returned.\n");
     fclose(file_object);
     return -1;
   }
