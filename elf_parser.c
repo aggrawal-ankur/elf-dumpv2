@@ -4,15 +4,7 @@
 #include <elf.h>
 #include "elf_parser.h"
 
-int parse_elf(const char *filename){
-  // Open the file
-  FILE *file_object = fopen(filename, "rb");
-
-  // Check if the file is opened correctly
-  if (!file_object){
-    perror("Error: file can't be opened! `fopen()`\n");
-    return -1;
-  }
+int parse_elf(FILE* file_object){
 
   // Data type for elf_header struct, coming from the elf.h file 
   Elf64_Ehdr elf_header;
@@ -38,6 +30,5 @@ int parse_elf(const char *filename){
   }
   printf("Valid ELF file detected.\n  Entry point: 0x%lx\n", elf_header.e_entry);
 
-  fclose(file_object);
   return 0;
 }

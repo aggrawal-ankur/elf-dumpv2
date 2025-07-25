@@ -7,10 +7,17 @@ int main(int argc, char *argv[]){
     return 1;
   }
 
-  if (parse_elf(argv[1]) != 0){
+  FILE* file_object = fopen(argv[1], "rb");
+  if (!file_object){
+    perror("Error: file can't be opened! `fopen()`\n");
+    return -1;
+  }
+
+  if (parse_elf(file_object) != 0){
     fprintf(stderr, "Failed to parse the ELF file.\n");
     return 1;
   }
 
+  fclose(file_object);
   return 0;
 }
