@@ -90,3 +90,43 @@ int parse_section_headers(FILE* file_object, Elf64_Shdr** shdrs_out, int* shdrs_
 
   return 0;
 }
+
+int parse_section_str_table(FILE* file_object, char*** shdr_strtab_out, int* entry_count){
+  Elf64_Ehdr file_headers;
+
+  if (parse_elf_header(file_object, &file_headers) != 0){
+    fprintf(stderr, "Error: `parse_elf_header`: ELF file headers can not be parsed!\n");
+    return -1;
+  }
+  
+  Elf64_Shdr* shdrs = NULL;
+  int section_count = 0;
+  
+  fseek(file_object, file_headers.e_shoff, SEEK_SET);
+  
+  if (parse_section_headers(file_object, &shdrs, &section_count) != 0){
+    fprintf(stderr, "Error: `parse_section_headers` failed to parse section headers.\n");
+    return -1;
+  }
+
+  int idx = file_headers.e_shstrndx;
+  int offset = (shdrs)[idx].sh_offset;
+  int size = (shdrs)[idx].sh_size;
+
+  fseek(file_object, offset, SEEK_SET);
+
+  char* raw_shdr_str_tab = malloc(size);
+  fread(raw_shdr_str_tab, 1, size, file_object);
+
+  char** shdr_strtab = malloc(section_count * sizeof(char*));
+  for (int i = 0; i < section_count; i++){
+    shdr_strtab[i] = strdup(&raw_shdr_str_tab[shdrs[i].sh_name]);
+  }
+
+  *shdr_strtab_out = shdr_strtab;
+  *entry_count = section_count;
+  free(raw_shdr_str_tab);
+  free(shdrs);
+
+  return 0;
+}
