@@ -32,6 +32,7 @@ int parse_program_headers(FILE* file_object, Elf64_Phdr** phdrs_out, int* phdrs_
     // We will allocate size enough for total entries in the phdr table.
   Elf64_Phdr* phdrs = malloc(file_headers.e_phnum * sizeof(Elf64_Phdr));
 
+  // Verify allocation
   if (!phdrs){
     fprintf(stderr, "Error: `malloc` failed to allocate memory in heap.\n");
     return -1;
@@ -51,6 +52,41 @@ int parse_program_headers(FILE* file_object, Elf64_Phdr** phdrs_out, int* phdrs_
   *phdrs_out = phdrs;
   // And the count of phdrs so that we don't have to use file_header api to get that value.
   *phdrs_count = file_headers.e_phnum;
+
+  return 0;
+}
+
+int parse_section_headers(FILE* file_object, Elf64_Shdr** shdrs_out, int* shdrs_count){
+  Elf64_Ehdr file_headers;
+
+  // Parse ELF file headers
+  if (parse_elf_header(file_object, &file_headers) != 0){
+    fprintf(stderr, "Error: `parse_elf_header()` ELF file headers can't be parsed!\n");
+    return -1;
+  }
+
+  // Seek
+  fseek(file_object, file_headers.e_shoff, SEEK_SET);
+
+  // Allocate memory
+  Elf64_Shdr* shdrs = malloc(file_headers.e_shnum * sizeof(Elf64_Shdr));
+
+  // Verify allocation
+  if (!shdrs){
+    fprintf(stderr, "Error: `malloc` failed to allocate memory in heap.\n");
+    return -1;
+  }
+
+  // Read shdrs now.
+  if (fread(shdrs, file_headers.e_shentsize, file_headers.e_shnum, file_object) != file_headers.e_shnum){
+    fprintf(stderr, "Error: `fread` failed to read section headers.\n");
+    free(shdrs);
+    return -1;
+  }
+
+  // Export
+  *shdrs_out = shdrs;
+  *shdrs_count = file_headers.e_shnum;
 
   return 0;
 }
