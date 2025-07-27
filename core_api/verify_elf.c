@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "verify_elf.h"
 
-int parse_elf(FILE* file_object){
+int verify_elf(FILE* file_object){
 
   // Store the 4 bytes of magic number
   unsigned char magic_number[4];

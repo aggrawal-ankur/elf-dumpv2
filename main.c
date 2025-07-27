@@ -1,5 +1,6 @@
 #include <stdio.h>
-#include "verify_elf.h"
+#include "core_api/verify_elf.h"
+#include "core_api/elf_parser.h"
 
 int main(int argc, char *argv[]){
   if (argc != 2){
@@ -13,7 +14,7 @@ int main(int argc, char *argv[]){
     return -1;
   }
 
-  if (parse_elf(file_object) != 0){
+  if (verify_elf(file_object) != 0){
     fprintf(stderr, "Error: `parse_elf()`: Failed to verify the ELF file.\n");
     return 1;
   }

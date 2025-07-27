@@ -3,6 +3,6 @@
 
 #include <stdio.h>
 
-int parse_elf(FILE* file_object);
+int verify_elf(FILE* file_object);
 
 #endif
