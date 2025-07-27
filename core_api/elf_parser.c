@@ -178,19 +178,38 @@ int parse_string_table(FILE* file_object, char*** str_tab_out, int* entry_count)
   // Finding the total entries in the string table
   int total_entries = 0;
   for (int i = 0; i < strtab_size; i++){
-    if (*raw_str_tab == '\0'){
+    if (raw_str_tab[i] == '\0'){
       total_entries++;
+    }
+  }
+
+  // Finding the length of each entry
+  int length_each_entry[total_entries];
+  int entry_cnt = 0;
+  int len_count = 0;
+  for (int i = 0; i < strtab_size; i++){
+    if (raw_str_tab[i] != '\0'){
+      len_count++ ;
+    }
+    else{
+      length_each_entry[entry_cnt] = len_count;
+      entry_cnt++ ;
     }
   }
 
   // Making them distinct
   char** str_tab = malloc(total_entries * sizeof(char*));
   for (int ith_entry = 0; ith_entry < total_entries; ith_entry++){
-    for (int jth_offset_in_ith_entry = 0; *raw_str_tab != '\0'; jth_offset_in_ith_entry++){
+    // Allocate individual char* entries inside char**
+    str_tab[ith_entry] = malloc(length_each_entry[ith_entry] + 1);
+
+    int jth_offset_in_ith_entry = 0;
+    for (; *raw_str_tab != '\0'; jth_offset_in_ith_entry++){
       str_tab[ith_entry][jth_offset_in_ith_entry] = *raw_str_tab;
-      *raw_str_tab++;
+      raw_str_tab++;
     }
-    *raw_str_tab++;
+    str_tab[ith_entry][jth_offset_in_ith_entry++] = '\0';
+    raw_str_tab++;
   }
 
   // Export
