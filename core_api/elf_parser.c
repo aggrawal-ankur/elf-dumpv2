@@ -171,6 +171,11 @@ int parse_string_table(FILE* file_object, char*** str_tab_out, int* entry_count)
     }
   }
 
+  if (!strtab_offset){
+    fprintf(stderr, "Error: .strtab can not be found!");
+    return -1;
+  }
+
   /* Parsing the string table */
   char* raw_str_tab = malloc(strtab_size);
   fread(raw_str_tab, 1, strtab_size, file_object);
@@ -184,7 +189,9 @@ int parse_string_table(FILE* file_object, char*** str_tab_out, int* entry_count)
   }
 
   // Finding the length of each entry
-  int length_each_entry[total_entries];
+     // Heap allocating so that it doesn't end up exhausting the stack and boom, an overflow!
+  int* length_each_entry = malloc(total_entries * sizeof(int));
+
   int entry_cnt = 0;
   int len_count = 0;
   for (int i = 0; i < strtab_size; i++){
@@ -218,6 +225,7 @@ int parse_string_table(FILE* file_object, char*** str_tab_out, int* entry_count)
 
   free(shdrs);
   free(raw_shdr_str_tab);
+  free(raw_str_tab);
 
   return 0;
 }
