@@ -16,7 +16,7 @@ int parse_program_headers(FILE* file_object, Elf64_Phdr** phdrs_out, int* phdrs_
   Elf64_Ehdr file_headers;
 
   // Read the ELF file headers
-  if (parse_elf_header(file_object, &file_headers) != 0){
+  if (parse_file_headers(file_object, &file_headers) != 0){
     fprintf(stderr, "Error: `parse_elf_header`: ELF file headers can't be parsed!\n");
     return -1;
   }
@@ -59,7 +59,7 @@ int parse_program_headers(FILE* file_object, Elf64_Phdr** phdrs_out, int* phdrs_
 int parse_section_headers(FILE* file_object, Elf64_Shdr** shdrs_out, int* shdrs_count){
   /* Part 1: Parse file headers */
   Elf64_Ehdr file_headers;
-  if (parse_elf_header(file_object, &file_headers) != 0){
+  if (parse_file_headers(file_object, &file_headers) != 0){
     fprintf(stderr, "Error: `parse_elf_header()` ELF file headers can't be parsed!\n");
     return -1;
   }
@@ -95,7 +95,7 @@ int parse_section_headers(FILE* file_object, Elf64_Shdr** shdrs_out, int* shdrs_
 int parse_section_str_table(FILE* file_object, char*** shdr_strtab_out, int* entry_count){
   /* Part 1: Parse file headers */
   Elf64_Ehdr file_headers;
-  if (parse_elf_header(file_object, &file_headers) != 0){
+  if (parse_file_headers(file_object, &file_headers) != 0){
     fprintf(stderr, "Error: `parse_elf_header`: failed to parse ELF file headers.\n");
     return -1;
   }
