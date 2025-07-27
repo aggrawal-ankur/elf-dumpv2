@@ -130,3 +130,77 @@ int parse_section_str_table(FILE* file_object, char*** shdr_strtab_out, int* ent
 
   return 0;
 }
+
+int parse_string_table(FILE* file_object, char*** str_tab_out, int* entry_count){
+  Elf64_Ehdr file_headers;
+  
+  if (parse_file_headers(file_object, &file_headers) != 0){
+    fprintf(stderr, "Error: `parse_file_headers` failed to parse the ELF file headers!\n");
+    return -1;
+  }
+
+  /* Parsing section headers*/
+  Elf64_Shdr* shdrs = NULL;
+  int section_count = 0;
+
+  fseek(file_object, file_headers.e_shoff, SEEK_SET);
+
+  if (parse_section_headers(file_object, &shdrs, &section_count) != 0){
+    fprintf(stderr, "Error: `parse_section_headers` failed to parse section headers.\n");
+    return -1;
+  }
+
+  /* Parsing section header string table for matching .strtab offset */
+    // Make a struct of these 3 as it is repeated (do it later)
+  int shdr_strtab_idx = file_headers.e_shstrndx;
+  int shdr_strtab_offset = (shdrs)[shdr_strtab_idx].sh_offset;
+  int shdr_str_size = (shdrs)[shdr_strtab_idx].sh_size;
+  fseek(file_object, shdr_strtab_offset, SEEK_SET);
+
+  char* raw_shdr_str_tab = malloc(shdr_str_size);
+  fread(raw_shdr_str_tab, 1, shdr_str_size, file_object);
+
+  int strtab_idx, strtab_offset, strtab_size;
+  // Optimize this for loop with any data structure, if possible (do it later).
+  for (int i = 0; i < section_count; i++){
+    if (shdrs[i].sh_type == SHT_STRTAB && (strcmp(&raw_shdr_str_tab[shdrs[i].sh_name], ".strtab") == 0)){
+      strtab_idx = i;
+      strtab_offset = (shdrs)[strtab_idx].sh_offset;
+      strtab_size = (shdrs)[strtab_idx].sh_size;
+      break;
+    }
+  }
+
+  /* Parsing the string table */
+  char* raw_str_tab = malloc(strtab_size);
+  fread(raw_str_tab, 1, strtab_size, file_object);
+
+  // Finding the total entries in the string table
+  int total_entries = 0;
+  for (int i = 0; i < strtab_size; i++){
+    if (*raw_str_tab == '\0'){
+      total_entries++;
+    }
+  }
+
+  // Making them distinct
+  char** str_tab = malloc(total_entries * sizeof(char*));
+  for (int ith_entry = 0; ith_entry < total_entries; ith_entry++){
+    for (int jth_offset_in_ith_entry = 0; *raw_str_tab != '\0'; jth_offset_in_ith_entry++){
+      str_tab[ith_entry][jth_offset_in_ith_entry] = *raw_str_tab;
+      *raw_str_tab++;
+    }
+    *raw_str_tab++;
+  }
+
+  // Export
+  *str_tab_out = str_tab;
+  *entry_count = total_entries;
+
+  free(shdrs);
+  free(raw_shdr_str_tab);
+
+  return 0;
+}
+
+// a b c d \0 e f g h \0
