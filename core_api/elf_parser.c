@@ -32,9 +32,9 @@ int parse_program_headers(FILE* file_object, Elf64_Phdr** phdrs_out, int* phdrs_
     // We will allocate size enough for total entries in the phdr table.
   Elf64_Phdr* phdrs = malloc(file_headers.e_phnum * sizeof(Elf64_Phdr));
 
-  // Verify allocation
+  // Verify memory allocation
   if (!phdrs){
-    fprintf(stderr, "Error: `malloc` failed to allocate memory in heap.\n");
+    fprintf(stderr, "Error: `malloc` failed to allocate memory in heap for `phdrs`.\n");
     return -1;
     free(phdrs);
   }
@@ -66,15 +66,15 @@ int parse_section_headers(FILE* file_object, Elf64_Shdr** shdrs_out, int* shdrs_
 
   /* Part 2: Parsing section headers*/
 
-  // Allocate memory in heap for section header entries
-  Elf64_Shdr* shdrs = malloc(file_headers.e_shnum * sizeof(Elf64_Shdr));
-
   // Seeking to the offset at which section headers are located
   fseek(file_object, file_headers.e_shoff, SEEK_SET);
 
+  // Allocate memory in heap for section header entries
+  Elf64_Shdr* shdrs = malloc(file_headers.e_shnum * sizeof(Elf64_Shdr));
+
   // Verify memory allocation
   if (!shdrs){
-    fprintf(stderr, "Error: `malloc` failed to allocate memory in heap.\n");
+    fprintf(stderr, "Error: `malloc` failed to allocate memory in heap for `shdrs`.\n");
     return -1;
   }
 
@@ -124,6 +124,12 @@ int parse_section_str_table(FILE* file_object, char*** shdr_strtab_out, int* ent
   // A flat 1-byte array to store section header string table entries.
   // It would be something like this: `s, e, c, t, i, o, n, \0, h, e, a, d, e, r, \0` and so on.
   char* raw_shdr_str_tab = malloc(size);
+
+  // Verify memory allocation
+  if (!raw_shdr_str_tab){
+    fprintf(stderr, "Error: `malloc` failed to allocate memory in heap for `raw_shdr_str_tab`.\n");
+    return -1;
+  }
   fread(raw_shdr_str_tab, 1, size, file_object);
     // Each entry 1 byte, total entry = size
 
@@ -131,6 +137,13 @@ int parse_section_str_table(FILE* file_object, char*** shdr_strtab_out, int* ent
 
   // A pointer to pointers pointing to individual entries
   char** shdr_strtab = malloc(section_count * sizeof(char*));
+
+  // Verify memory allocation
+  if (!shdr_strtab){
+    fprintf(stderr, "Error: `malloc` failed to allocate memory in heap for `shdr_strtab` .\n");
+    return -1;
+  }
+
   for (int i = 0; i < section_count; i++){
     shdr_strtab[i] = strdup(&raw_shdr_str_tab[shdrs[i].sh_name]);
     // Note: `strdup()` will manage allocating memory to char* entries
@@ -179,6 +192,13 @@ int parse_string_table(FILE* file_object, char*** str_tab_out, int* entry_count)
   // A flat 1-byte array to store section header string table entries.
   // It would be something like this: `s, e, c, t, i, o, n, \0, h, e, a, d, e, r, \0` and so on.
   char* raw_shdr_str_tab = malloc(shdr_str_size);
+
+  // Verify memory allocation
+  if (!raw_shdr_str_tab){
+    fprintf(stderr, "Error: `malloc` failed to allocate memory in heap for `raw_shdr_str_tab`.\n");
+    return -1;
+  }
+
   fread(raw_shdr_str_tab, 1, shdr_str_size, file_object);
     // Each entry 1 byte, total entry = size
 
@@ -204,6 +224,13 @@ int parse_string_table(FILE* file_object, char*** str_tab_out, int* entry_count)
   // A flat 1-byte array to store the string table content in raw form.
   // It would be something like this: `s, e, c, t, i, o, n, \0, h, e, a, d, e, r, \0` and so on.
   char* raw_str_tab = malloc(strtab_size);
+
+  // Verify memory allocation
+  if (!raw_str_tab){
+    fprintf(stderr, "Error: `malloc` failed to allocate memory in heap for `raw_str_tab` .\n");
+    return -1;
+  }
+
   fread(raw_str_tab, 1, strtab_size, file_object);
 
   // Finding total no. of entries in the string table
@@ -216,7 +243,13 @@ int parse_string_table(FILE* file_object, char*** str_tab_out, int* entry_count)
 
   // Find the length of each entry.
   // Heap allocating the array so that it doesn't end up exhausting the stack and boom, an overflow!
-  int* entry_length = malloc(entry_len_strtab * sizeof(int));
+  int* entry_lengths = malloc(entry_len_strtab * sizeof(int));
+
+  // Verify memory allocation
+  if (!entry_lengths){
+    fprintf(stderr, "Error: `malloc` failed to allocate memory in heap for `entry_lengths`.\n");
+    return -1;
+  }
 
   int entry_cnt = 0;  // traversing based on the number of entry
   int len_count = 0;  // traversing based on the characters in each entry
@@ -225,7 +258,7 @@ int parse_string_table(FILE* file_object, char*** str_tab_out, int* entry_count)
       len_count++ ;
     }
     else{
-      entry_length[entry_cnt] = len_count;
+      entry_lengths[entry_cnt] = len_count;
       entry_cnt++ ;
       len_count = 0;
     }
@@ -236,11 +269,17 @@ int parse_string_table(FILE* file_object, char*** str_tab_out, int* entry_count)
   // A pointer to pointers pointing to individual entries
   char** str_tab = malloc(entry_len_strtab * sizeof(char*));
 
+  // Verify memory allocation
+  if (!str_tab){
+    fprintf(stderr, "Error: `malloc` failed to allocate memory in heap for `str_tab`.\n");
+    return -1;
+  }
+
   // i: each individual entry of type char*
   // j: individual characters in each entry of type char*
   for (int i = 0; i < entry_len_strtab; i++){
     // Allocate individual char* entries inside char**
-    str_tab[i] = malloc(entry_length[i] + 1);
+    str_tab[i] = malloc(entry_lengths[i] + 1);
 
     int j = 0;
     for (; *raw_str_tab != '\0'; j++){
