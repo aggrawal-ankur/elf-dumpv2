@@ -57,34 +57,35 @@ int parse_program_headers(FILE* file_object, Elf64_Phdr** phdrs_out, int* phdrs_
 }
 
 int parse_section_headers(FILE* file_object, Elf64_Shdr** shdrs_out, int* shdrs_count){
+  /* Part 1: Parse file headers */
   Elf64_Ehdr file_headers;
-
-  // Parse ELF file headers
   if (parse_elf_header(file_object, &file_headers) != 0){
     fprintf(stderr, "Error: `parse_elf_header()` ELF file headers can't be parsed!\n");
     return -1;
   }
 
-  // Seek
-  fseek(file_object, file_headers.e_shoff, SEEK_SET);
+  /* Part 2: Parsing section headers*/
 
-  // Allocate memory
+  // Allocate memory in heap for section header entries
   Elf64_Shdr* shdrs = malloc(file_headers.e_shnum * sizeof(Elf64_Shdr));
 
-  // Verify allocation
+  // Seeking to the offset at which section headers are located
+  fseek(file_object, file_headers.e_shoff, SEEK_SET);
+
+  // Verify memory allocation
   if (!shdrs){
     fprintf(stderr, "Error: `malloc` failed to allocate memory in heap.\n");
     return -1;
   }
 
-  // Read shdrs now.
+  // Read shdrs now
   if (fread(shdrs, file_headers.e_shentsize, file_headers.e_shnum, file_object) != file_headers.e_shnum){
     fprintf(stderr, "Error: `fread` failed to read section headers.\n");
     free(shdrs);
     return -1;
   }
 
-  // Export
+  /* Part 5: Export section headers and the entry count */
   *shdrs_out = shdrs;
   *shdrs_count = file_headers.e_shnum;
 
@@ -92,39 +93,54 @@ int parse_section_headers(FILE* file_object, Elf64_Shdr** shdrs_out, int* shdrs_
 }
 
 int parse_section_str_table(FILE* file_object, char*** shdr_strtab_out, int* entry_count){
+  /* Part 1: Parse file headers */
   Elf64_Ehdr file_headers;
-
   if (parse_elf_header(file_object, &file_headers) != 0){
-    fprintf(stderr, "Error: `parse_elf_header`: ELF file headers can not be parsed!\n");
+    fprintf(stderr, "Error: `parse_elf_header`: failed to parse ELF file headers.\n");
     return -1;
   }
-  
+
+  /* Part 2: Parsing section headers*/
   Elf64_Shdr* shdrs = NULL;
   int section_count = 0;
-  
+
+  // Seeking to the offset at which section headers are located
   fseek(file_object, file_headers.e_shoff, SEEK_SET);
   
+  // Parse!
   if (parse_section_headers(file_object, &shdrs, &section_count) != 0){
     fprintf(stderr, "Error: `parse_section_headers` failed to parse section headers.\n");
     return -1;
   }
 
+  /* Part 3: Parsing section header string table to find the location of string table */
   int idx = file_headers.e_shstrndx;
   int offset = (shdrs)[idx].sh_offset;
   int size = (shdrs)[idx].sh_size;
 
+  // Seek to the offset where the section header string table is located.
   fseek(file_object, offset, SEEK_SET);
 
+  // A flat 1-byte array to store section header string table entries.
+  // It would be something like this: `s, e, c, t, i, o, n, \0, h, e, a, d, e, r, \0` and so on.
   char* raw_shdr_str_tab = malloc(size);
   fread(raw_shdr_str_tab, 1, size, file_object);
+    // Each entry 1 byte, total entry = size
 
+  /* Part 4: Making the string entries distinct */
+
+  // A pointer to pointers pointing to individual entries
   char** shdr_strtab = malloc(section_count * sizeof(char*));
   for (int i = 0; i < section_count; i++){
     shdr_strtab[i] = strdup(&raw_shdr_str_tab[shdrs[i].sh_name]);
+    // Note: `strdup()` will manage allocating memory to char* entries
   }
 
+  /* Part 5: Export section header string table and the entry count */
   *shdr_strtab_out = shdr_strtab;
   *entry_count = section_count;
+
+  /* Part 6: Free the heap-allocated memory used in mgmt */
   free(raw_shdr_str_tab);
   free(shdrs);
 
@@ -132,36 +148,42 @@ int parse_section_str_table(FILE* file_object, char*** shdr_strtab_out, int* ent
 }
 
 int parse_string_table(FILE* file_object, char*** str_tab_out, int* entry_count){
+  /* Part 1: Parse file headers */
   Elf64_Ehdr file_headers;
-  
   if (parse_file_headers(file_object, &file_headers) != 0){
-    fprintf(stderr, "Error: `parse_file_headers` failed to parse the ELF file headers!\n");
+    fprintf(stderr, "Error: `parse_file_headers` failed to parse the ELF file headers.\n");
     return -1;
   }
 
-  /* Parsing section headers*/
+  /* Part 2: Parsing section headers*/
   Elf64_Shdr* shdrs = NULL;
   int section_count = 0;
 
+  // Seeking to the offset at which section headers are located
   fseek(file_object, file_headers.e_shoff, SEEK_SET);
 
+  // Parse!
   if (parse_section_headers(file_object, &shdrs, &section_count) != 0){
     fprintf(stderr, "Error: `parse_section_headers` failed to parse section headers.\n");
     return -1;
   }
 
-  /* Parsing section header string table for matching .strtab offset */
-    // Make a struct of these 3 as it is repeated (do it later)
+  /* Part 3: Parsing section header string table to find the location of string table */
   int shdr_strtab_idx = file_headers.e_shstrndx;
   int shdr_strtab_offset = (shdrs)[shdr_strtab_idx].sh_offset;
   int shdr_str_size = (shdrs)[shdr_strtab_idx].sh_size;
+
+  // Seek to the offset where the section header string table is located.
   fseek(file_object, shdr_strtab_offset, SEEK_SET);
 
+  // A flat 1-byte array to store section header string table entries.
+  // It would be something like this: `s, e, c, t, i, o, n, \0, h, e, a, d, e, r, \0` and so on.
   char* raw_shdr_str_tab = malloc(shdr_str_size);
   fread(raw_shdr_str_tab, 1, shdr_str_size, file_object);
+    // Each entry 1 byte, total entry = size
 
+  // Extracting metadata about string table
   int strtab_idx, strtab_offset, strtab_size;
-  // Optimize this for loop with any data structure, if possible (do it later).
   for (int i = 0; i < section_count; i++){
     if (shdrs[i].sh_type == SHT_STRTAB && (strcmp(&raw_shdr_str_tab[shdrs[i].sh_name], ".strtab") == 0)){
       strtab_idx = i;
@@ -170,64 +192,74 @@ int parse_string_table(FILE* file_object, char*** str_tab_out, int* entry_count)
       break;
     }
   }
-
+  
+  // If string table is not found, report and exit.
   if (!strtab_offset){
     fprintf(stderr, "Error: .strtab can not be found!");
     return -1;
   }
-
-  /* Parsing the string table */
+  
+  /* Part 4: Parsing the string table */
+  
+  // A flat 1-byte array to store the string table content in raw form.
+  // It would be something like this: `s, e, c, t, i, o, n, \0, h, e, a, d, e, r, \0` and so on.
   char* raw_str_tab = malloc(strtab_size);
   fread(raw_str_tab, 1, strtab_size, file_object);
 
-  // Finding the total entries in the string table
-  int total_entries = 0;
+  // Finding total no. of entries in the string table
+  int entry_len_strtab = 0;
   for (int i = 0; i < strtab_size; i++){
     if (raw_str_tab[i] == '\0'){
-      total_entries++;
+      entry_len_strtab++;
     }
   }
 
-  // Finding the length of each entry
-     // Heap allocating so that it doesn't end up exhausting the stack and boom, an overflow!
-  int* length_each_entry = malloc(total_entries * sizeof(int));
+  // Find the length of each entry.
+  // Heap allocating the array so that it doesn't end up exhausting the stack and boom, an overflow!
+  int* entry_length = malloc(entry_len_strtab * sizeof(int));
 
-  int entry_cnt = 0;
-  int len_count = 0;
+  int entry_cnt = 0;  // traversing based on the number of entry
+  int len_count = 0;  // traversing based on the characters in each entry
   for (int i = 0; i < strtab_size; i++){
     if (raw_str_tab[i] != '\0'){
       len_count++ ;
     }
     else{
-      length_each_entry[entry_cnt] = len_count;
+      entry_length[entry_cnt] = len_count;
       entry_cnt++ ;
+      len_count = 0;
     }
   }
 
-  // Making them distinct
-  char** str_tab = malloc(total_entries * sizeof(char*));
-  for (int ith_entry = 0; ith_entry < total_entries; ith_entry++){
-    // Allocate individual char* entries inside char**
-    str_tab[ith_entry] = malloc(length_each_entry[ith_entry] + 1);
+  /* Part 5: Making the string entries distinct */
 
-    int jth_offset_in_ith_entry = 0;
-    for (; *raw_str_tab != '\0'; jth_offset_in_ith_entry++){
-      str_tab[ith_entry][jth_offset_in_ith_entry] = *raw_str_tab;
+  // A pointer to pointers pointing to individual entries
+  char** str_tab = malloc(entry_len_strtab * sizeof(char*));
+
+  // i: each individual entry of type char*
+  // j: individual characters in each entry of type char*
+  for (int i = 0; i < entry_len_strtab; i++){
+    // Allocate individual char* entries inside char**
+    str_tab[i] = malloc(entry_length[i] + 1);
+
+    int j = 0;
+    for (; *raw_str_tab != '\0'; j++){
+      str_tab[i][j] = *raw_str_tab;
       raw_str_tab++;
     }
-    str_tab[ith_entry][jth_offset_in_ith_entry++] = '\0';
+    str_tab[i][j++] = '\0';
+
     raw_str_tab++;
   }
 
-  // Export
+  /* Part 6: Export the string table and the entry count */
   *str_tab_out = str_tab;
-  *entry_count = total_entries;
+  *entry_count = entry_len_strtab;
 
+  /* Part 7: Free the heap-allocated memory used in mgmt */
   free(shdrs);
   free(raw_shdr_str_tab);
   free(raw_str_tab);
 
   return 0;
 }
-
-// a b c d \0 e f g h \0
