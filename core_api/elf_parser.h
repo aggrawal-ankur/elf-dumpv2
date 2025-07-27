@@ -5,5 +5,8 @@
 #include <elf.h>
 
 int parse_file_headers(FILE* file_object, Elf64_Ehdr* elf_hdr_out);
+int parse_program_headers(FILE* file_object, Elf64_Phdr** phdrs_out, int* phdrs_count);
+int parse_section_headers(FILE* file_object, Elf64_Shdr** shdrs_out, int* shdrs_count);
+int parse_section_str_table(FILE* file_object, char*** shdr_strtab_out, int* entry_count);
 
-#endif 
+#endif
