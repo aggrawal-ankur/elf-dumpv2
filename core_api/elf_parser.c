@@ -12,17 +12,12 @@ int parse_file_headers(FILE* file_object, Elf64_Ehdr* elf_hdr_out){
   return 0;
 }
 
-int parse_program_headers(FILE* file_object, Elf64_Phdr** phdrs_out, int* phdrs_count){
-  Elf64_Ehdr file_headers;
-
-  // Read the ELF file headers
-  if (parse_file_headers(file_object, &file_headers) != 0){
-    fprintf(stderr, "Error: `parse_elf_header`: ELF file headers can't be parsed!\n");
+int parse_program_headers(FILE* file_object, Elf64_Ehdr* file_headers, Elf64_Phdr** phdrs_out, int* phdrs_count){
+  // Check if file headers are received or not
+  if (!file_headers){
+    fprintf(stderr, "Error: File headers not received.\n  Inside `parse_program_headers`.\n");
     return -1;
   }
-
-  // Seek to the offset where the program headers table start from
-  fseek(file_object, file_headers.e_phoff, SEEK_SET);
 
   // Normal arrays are stack-allocated.
     // Their lifecycle is the lifecycle of the block that contains them.
@@ -30,7 +25,7 @@ int parse_program_headers(FILE* file_object, Elf64_Phdr** phdrs_out, int* phdrs_
   // Instead, we can create a dynamically allocated array, which is a heap-allocated array.
     // It's lives until it is deallocated.
     // We will allocate size enough for total entries in the phdr table.
-  Elf64_Phdr* phdrs = malloc(file_headers.e_phnum * sizeof(Elf64_Phdr));
+  Elf64_Phdr* phdrs = malloc(file_headers->e_phnum * sizeof(Elf64_Phdr));
 
   // Verify memory allocation
   if (!phdrs){
@@ -38,11 +33,14 @@ int parse_program_headers(FILE* file_object, Elf64_Phdr** phdrs_out, int* phdrs_
     return -1;
     free(phdrs);
   }
+
+  // Seek to the offset where the program headers table start from
+  fseek(file_object, file_headers->e_phoff, SEEK_SET);
   
   // Read phdrs now
-  if (fread(phdrs, file_headers.e_phentsize, file_headers.e_phnum, file_object) != file_headers.e_phnum){
+  if (fread(phdrs, file_headers->e_phentsize, file_headers->e_phnum, file_object) != file_headers->e_phnum){
     fprintf(stderr, "Error: `fread` failed to read program headers.\n");
-    
+
     // free the memory if it couldn't be used.
     free(phdrs);
     return -1;
@@ -51,52 +49,46 @@ int parse_program_headers(FILE* file_object, Elf64_Phdr** phdrs_out, int* phdrs_
   // Export the phdrs to the outer pointer.
   *phdrs_out = phdrs;
   // And the count of phdrs so that we don't have to use file_header api to get that value.
-  *phdrs_count = file_headers.e_phnum;
+  *phdrs_count = file_headers->e_phnum;
 
   return 0;
 }
 
-int parse_section_headers(FILE* file_object, Elf64_Shdr** shdrs_out, int* shdrs_count){
-  /* Part 1: Parse file headers */
-  Elf64_Ehdr file_headers;
-  if (parse_file_headers(file_object, &file_headers) != 0){
-    fprintf(stderr, "Error: `parse_elf_header()` ELF file headers can't be parsed!\n");
+int parse_section_headers(FILE* file_object, Elf64_Ehdr* file_headers, Elf64_Shdr** shdrs_out, int* shdrs_count){
+  // Check if file headers are received or not
+  if (!file_headers){
+    fprintf(stderr, "Error: File headers not received.\n  Inside `parse_section_headers`.\n");
     return -1;
   }
 
-  /* Part 2: Parsing section headers*/
-
-  // Seeking to the offset at which section headers are located
-  fseek(file_object, file_headers.e_shoff, SEEK_SET);
-
-  // Allocate memory in heap for section header entries
-  Elf64_Shdr* shdrs = malloc(file_headers.e_shnum * sizeof(Elf64_Shdr));
-
-  // Verify memory allocation
+  // Since file_headers is a pointer to a struct now, we can't use `.` based referencing.
+  // We have to dereference the pointer, then access the value.
+  // file_headers->e_shnum = (*file_headers).e_shnum
+  Elf64_Shdr* shdrs = malloc(file_headers->e_shnum * sizeof(Elf64_Shdr));
   if (!shdrs){
     fprintf(stderr, "Error: `malloc` failed to allocate memory in heap for `shdrs`.\n");
     return -1;
   }
 
-  // Read shdrs now
-  if (fread(shdrs, file_headers.e_shentsize, file_headers.e_shnum, file_object) != file_headers.e_shnum){
+  // Seek to the offset where section headers are located.
+  fseek(file_object, file_headers->e_shoff, SEEK_SET);
+  if (fread(shdrs, file_headers->e_shentsize, file_headers->e_shnum, file_object) != file_headers->e_shnum){
     fprintf(stderr, "Error: `fread` failed to read section headers.\n");
     free(shdrs);
     return -1;
   }
 
-  /* Part 5: Export section headers and the entry count */
+  // Export
   *shdrs_out = shdrs;
-  *shdrs_count = file_headers.e_shnum;
+  *shdrs_count = file_headers->e_shnum;
 
   return 0;
 }
 
-int parse_section_str_table(FILE* file_object, char*** shdr_strtab_out, int* entry_count){
-  /* Part 1: Parse file headers */
-  Elf64_Ehdr file_headers;
-  if (parse_file_headers(file_object, &file_headers) != 0){
-    fprintf(stderr, "Error: `parse_elf_header`: failed to parse ELF file headers.\n");
+int parse_section_str_table(FILE* file_object, Elf64_Ehdr* file_headers, char*** shdr_strtab_out, int* entry_count){
+  /* Part 1: Check if file headers are received or not */
+  if (!file_headers){
+    fprintf(stderr, "Error: ELF file headers not received, inside `parse_section_headers`.\n");
     return -1;
   }
 
@@ -104,17 +96,13 @@ int parse_section_str_table(FILE* file_object, char*** shdr_strtab_out, int* ent
   Elf64_Shdr* shdrs = NULL;
   int section_count = 0;
 
-  // Seeking to the offset at which section headers are located
-  fseek(file_object, file_headers.e_shoff, SEEK_SET);
-  
-  // Parse!
-  if (parse_section_headers(file_object, &shdrs, &section_count) != 0){
+  if (parse_section_headers(file_object, file_headers, &shdrs, &section_count) != 0){
     fprintf(stderr, "Error: `parse_section_headers` failed to parse section headers.\n");
     return -1;
   }
 
   /* Part 3: Parsing section header string table to find the location of string table */
-  int idx = file_headers.e_shstrndx;
+  int idx = file_headers->e_shstrndx;
   int offset = (shdrs)[idx].sh_offset;
   int size = (shdrs)[idx].sh_size;
 
@@ -160,11 +148,10 @@ int parse_section_str_table(FILE* file_object, char*** shdr_strtab_out, int* ent
   return 0;
 }
 
-int parse_string_table(FILE* file_object, char*** str_tab_out, int* entry_count){
-  /* Part 1: Parse file headers */
-  Elf64_Ehdr file_headers;
-  if (parse_file_headers(file_object, &file_headers) != 0){
-    fprintf(stderr, "Error: `parse_file_headers` failed to parse the ELF file headers.\n");
+int parse_string_table(FILE* file_object, Elf64_Ehdr* file_headers, char*** str_tab_out, int* entry_count){
+  /* Part 1: Check if file headers are received or not */
+  if (!file_headers){
+    fprintf(stderr, "Error: File headers not received.\n  Inside `parse_string_table`.\n");
     return -1;
   }
 
@@ -172,17 +159,13 @@ int parse_string_table(FILE* file_object, char*** str_tab_out, int* entry_count)
   Elf64_Shdr* shdrs = NULL;
   int section_count = 0;
 
-  // Seeking to the offset at which section headers are located
-  fseek(file_object, file_headers.e_shoff, SEEK_SET);
-
-  // Parse!
-  if (parse_section_headers(file_object, &shdrs, &section_count) != 0){
+  if (parse_section_headers(file_object, file_headers, &shdrs, &section_count) != 0){
     fprintf(stderr, "Error: `parse_section_headers` failed to parse section headers.\n");
     return -1;
   }
 
   /* Part 3: Parsing section header string table to find the location of string table */
-  int shdr_strtab_idx = file_headers.e_shstrndx;
+  int shdr_strtab_idx = file_headers->e_shstrndx;
   int shdr_strtab_offset = (shdrs)[shdr_strtab_idx].sh_offset;
   int shdr_str_size = (shdrs)[shdr_strtab_idx].sh_size;
 
