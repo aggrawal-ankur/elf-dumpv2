@@ -20,7 +20,6 @@ int verify_elf(FILE* file_object){
     fclose(file_object);
     return -1;
   }
-  printf("The file is a valid ELF. Proceeding with complete parsing.\n");
 
   return 0;
 }

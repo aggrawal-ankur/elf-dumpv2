@@ -5,10 +5,13 @@
 #include "elf_parser.h"
 
 int parse_ehdr(FILE* f_obj, Elf64_Ehdr* out_ehdr){
+  // Start the file object from 0
+  fseek(f_obj, 0, SEEK_SET);          // rewind(f_obj);
   if (fread(out_ehdr, 1, sizeof(Elf64_Ehdr), f_obj) != sizeof(Elf64_Ehdr)) {
     fprintf(stderr, "Error: `fread()`: Not a valid ELF! Unexpected bytes returned.\n");
     return -1;
   }
+
   return 0;
 }
 
@@ -31,18 +34,15 @@ int parse_phdrs(FILE* f_obj, Elf64_Ehdr* ehdr, Elf64_Phdr** out_phdrs, int* phdr
   if (!phdrs){
     fprintf(stderr, "Error: `malloc` failed to allocate memory in heap for `phdrs`.\n");
     return -1;
-    free(phdrs);
   }
 
   // Seek to the offset where the program headers table start from
   fseek(f_obj, ehdr->e_phoff, SEEK_SET);
-  
+
   // Read phdrs now
   if (fread(phdrs, ehdr->e_phentsize, ehdr->e_phnum, f_obj) != ehdr->e_phnum){
     fprintf(stderr, "Error: `fread` failed to read program headers.\n");
-
-    // free the memory if it couldn't be used.
-    free(phdrs);
+    free(phdrs);        // free the memory if it couldn't be used.
     return -1;
   }
 
@@ -51,6 +51,7 @@ int parse_phdrs(FILE* f_obj, Elf64_Ehdr* ehdr, Elf64_Phdr** out_phdrs, int* phdr
   // And the count of phdrs so that we don't have to use file_header api to get that value.
   *phdrs_count = ehdr->e_phnum;
 
+  printf("It reached the end!\n");
   return 0;
 }
 
@@ -82,6 +83,10 @@ int parse_shdrs(FILE* f_obj, Elf64_Ehdr* ehdr, Elf64_Shdr** out_shdrs, int* shdr
   *out_shdrs = shdrs;
   *shdrs_count = ehdr->e_shnum;
 
+  // printf("phdr count: %d\n", ehdr->e_phnum);
+  // printf("shdr count: %d\n", ehdr->e_shnum);
+  // printf("phdr size: %d\n", ehdr->e_phentsize);
+  // printf("shdr size: %d\n", ehdr->e_shentsize);
   return 0;
 }
 
@@ -159,20 +164,20 @@ int parse_strtab(FILE* f_obj, Elf64_Ehdr* ehdr, char*** out_strtab, int* entry_c
   Elf64_Shdr* shdrs = NULL;
   int shdr_count = 0;
 
-  if (parse_shdrs(f_obj, ehdr, shdrs, shdr_count) != 0){
+  if (parse_shdrs(f_obj, ehdr, &shdrs, &shdr_count) != 0){
     fprintf(stderr, "Error: `parse_shdrs`");    
     return -1;
   }
 
   char* raw_shstrtab = NULL;
-  char*** fshstrtab = NULL;
+  char** fshstrtab = NULL;
   int total_entries = 0;
 
-  if (parse_shstrtab(f_obj, ehdr, raw_shstrtab, &fshstrtab, total_entries) != 0){
+  if (parse_shstrtab(f_obj, ehdr, raw_shstrtab, &fshstrtab, &total_entries) != 0){
     fprintf(stderr, "Error: `parse_shstrtab` failed to parse.\n");
     return -1;
   }
-
+  
   // Extracting metadata about string table
   int strtab_idx, strtab_offset, strtab_size;
   for (int i = 0; i < shdr_count; i++){
@@ -183,6 +188,7 @@ int parse_strtab(FILE* f_obj, Elf64_Ehdr* ehdr, char*** out_strtab, int* entry_c
       break;
     }
   }
+  // printf("done so far\n");
   
   // If string table is not found, report and exit.
   if (!strtab_offset){
