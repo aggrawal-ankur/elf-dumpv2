@@ -90,7 +90,7 @@ int parse_shdrs(FILE* f_obj, Elf64_Ehdr* ehdr, Elf64_Shdr** out_shdrs, int* shdr
   return 0;
 }
 
-int parse_shstrtab(FILE* f_obj, Elf64_Ehdr* ehdr, char* out_raw_shstrtab, char*** out_shstrtab, int* entry_count){
+int parse_shstrtab(FILE* f_obj, Elf64_Ehdr* ehdr, char** out_raw_shstrtab, char*** out_shstrtab, int* entry_count){
   /* Part 1: Check if file headers are received or not */
   if (!ehdr){
     fprintf(stderr, "Error: ELF file headers not received, inside `parse_shdrs`.\n");
@@ -126,6 +126,19 @@ int parse_shstrtab(FILE* f_obj, Elf64_Ehdr* ehdr, char* out_raw_shstrtab, char**
   fread(raw_shstrtab, 1, shstr_size, f_obj);
     // Each entry 1 byte, total entry = size
 
+  if (!raw_shstrtab){
+    printf("null str tab\n");
+    return -1;
+  }
+  /* Print raw_shdr_strtab
+  for (int i = 0; i < shstr_size; i++){
+    if (raw_shstrtab[i] == '\0')
+      putchar('\n');
+    else
+      putchar(raw_shstrtab[i]);
+  }
+  */
+
   /* Part 4: Making the string entries distinct */
 
   // A pointer to pointers pointing to individual entries
@@ -142,9 +155,15 @@ int parse_shstrtab(FILE* f_obj, Elf64_Ehdr* ehdr, char* out_raw_shstrtab, char**
     // Note: `strdup()` will manage allocating memory to char* entries
   }
 
+  /* Print formatted section header string table
+  for (int i = 0; i < shdr_count; i++) {
+    printf("%s\n", shdr_strtab[i]);
+  }
+  */
+
   /* Part 5: Export section header string table and the entry count */
   *out_shstrtab = shdr_strtab;
-  out_raw_shstrtab = raw_shstrtab;
+  *out_raw_shstrtab = raw_shstrtab;
   *entry_count = shdr_count;
 
   /* Part 6: Free the heap-allocated memory used in mgmt */
@@ -165,7 +184,7 @@ int parse_strtab(FILE* f_obj, Elf64_Ehdr* ehdr, char*** out_strtab, int* entry_c
   int shdr_count = 0;
 
   if (parse_shdrs(f_obj, ehdr, &shdrs, &shdr_count) != 0){
-    fprintf(stderr, "Error: `parse_shdrs`");    
+    fprintf(stderr, "Error: `parse_shdrs` failed to parse section headers!\n");    
     return -1;
   }
 
@@ -173,22 +192,37 @@ int parse_strtab(FILE* f_obj, Elf64_Ehdr* ehdr, char*** out_strtab, int* entry_c
   char** fshstrtab = NULL;
   int total_entries = 0;
 
-  if (parse_shstrtab(f_obj, ehdr, raw_shstrtab, &fshstrtab, &total_entries) != 0){
-    fprintf(stderr, "Error: `parse_shstrtab` failed to parse.\n");
+  if (parse_shstrtab(f_obj, ehdr, &raw_shstrtab, &fshstrtab, &total_entries) != 0){
+    fprintf(stderr, "Error: `parse_shstrtab` failed to parse section header string table.\n");
     return -1;
   }
-  
+
+  if (!raw_shstrtab){
+    fprintf(stderr, "Error: null");
+    return -1;
+  }
+
   // Extracting metadata about string table
   int strtab_idx, strtab_offset, strtab_size;
+  char* str = ".strtab";
+
+  // for (int i =0; i < shdr_count; i++){
+  //   printf("%s\n", &raw_shstrtab[shdrs[i].sh_name]);
+  //   if (strcmp(&raw_shstrtab[shdrs[i].sh_name], str) == 0){
+  //     printf("inside\n");
+  //     break;
+  //   }
+  // }
+
   for (int i = 0; i < shdr_count; i++){
-    if (shdrs[i].sh_type == SHT_STRTAB && (strcmp(&raw_shstrtab[shdrs[i].sh_name], ".strtab") == 0)){
+    if (shdrs[i].sh_type == SHT_STRTAB && (strcmp(&raw_shstrtab[shdrs[i].sh_name], str) == 0)){
       strtab_idx = i;
       strtab_offset = (shdrs)[strtab_idx].sh_offset;
       strtab_size = (shdrs)[strtab_idx].sh_size;
       break;
     }
   }
-  // printf("done so far\n");
+  printf("done so far\n");
   
   // If string table is not found, report and exit.
   if (!strtab_offset){
@@ -254,6 +288,7 @@ int parse_strtab(FILE* f_obj, Elf64_Ehdr* ehdr, char*** out_strtab, int* entry_c
 
   // i: each individual entry of type char*
   // j: individual characters in each entry of type char*
+  char* temp = raw_str_tab;
   for (int i = 0; i < entry_len_strtab; i++){
     // Allocate individual char* entries inside char**
     str_tab[i] = malloc(entry_lengths[i] + 1);
@@ -275,7 +310,7 @@ int parse_strtab(FILE* f_obj, Elf64_Ehdr* ehdr, char*** out_strtab, int* entry_c
   /* Part 7: Free the heap-allocated memory used in mgmt */
   free(shdrs);
   free(raw_shstrtab);
-  free(raw_str_tab);
+  free(temp);
 
   return 0;
 }

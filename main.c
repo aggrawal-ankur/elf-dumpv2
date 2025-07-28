@@ -53,7 +53,7 @@ int main(int argc, char *argv[]){
   char** out_shstrtab = NULL;
   int sh_entry_count = 0;
   printf("Parsing section header string table....\n");
-  if (parse_shstrtab(file_object, &ehdr, out_raw_shstrtab, &out_shstrtab, &sh_entry_count) != 0){
+  if (parse_shstrtab(file_object, &ehdr, &out_raw_shstrtab, &out_shstrtab, &sh_entry_count) != 0){
     fprintf(stderr, "  Error: section header string table can not be parsed.\n");
     return -1;
   }
