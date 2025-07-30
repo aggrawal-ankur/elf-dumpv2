@@ -31,7 +31,7 @@ int main(int argc, char *argv[]){
     fprintf(stderr, "Error: `malloc` failed to allocate memory for `AccessELF`\n");
     return -1;
   }
-  memset(AccessELF, 0, sizeof(ElfFile));
+  memset(AccessELF, 0, sizeof(ElfFile));           // To make ptrs null and variables 0 in one hit.
 
   printf("Parsing file headers....\n");
   if (parse_ehdr(f_obj, AccessELF) != 0){

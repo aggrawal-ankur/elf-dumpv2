@@ -5,13 +5,9 @@
 #include <elf.h>
 
 typedef struct {
-  Elf64_Ehdr* ehdr;          // File Header
-
+  Elf64_Ehdr* ehdr;         // File Header
   Elf64_Phdr* phdrs;        // Program Headers
-  int phdrs_count;          // └─ count
-  
   Elf64_Shdr* shdrs;        // Section Headers
-  int shdrs_count;          // └─ count
 
   char* r_shstrtab;         // flat section header string table dump
   int r_shstr_count;        // └─ count of total bytes
