@@ -22,6 +22,7 @@ typedef struct {
   int f_str_count;          // └─ count of total individual entries
 
   Elf64_Sym* symtab;        // Symbol Table
+  Elf64_Sym* dynsym;        // Dynamic Symbol Table
 
 } ElfFile;
 
@@ -31,5 +32,6 @@ int parse_shdrs(FILE* f_obj, ElfFile* AccessFile);
 int parse_shstrtab(FILE* f_obj, ElfFile* AccessFile);
 int parse_strtab(FILE* f_obj, ElfFile* AccessFile);
 int parse_symtab(FILE* f_obj, ElfFile* AccessFile);
+int parse_dynsym(FILE* f_obj, ElfFile* AccessELF);
 
 #endif
