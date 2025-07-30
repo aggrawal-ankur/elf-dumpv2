@@ -247,3 +247,47 @@ int parse_strtab(FILE* f_obj, ElfFile* AccessELF){
 
   return 0;
 }
+
+int parse_symtab(FILE* f_obj, ElfFile* AccessELF){
+  if (!(&AccessELF->ehdr)){
+    fprintf(stderr, "  └─ Error: File headers are empty.\n     API: `parse_symtab`.\n");
+    return -1;
+  }
+
+  if (!(&AccessELF->shdrs)){
+    fprintf(stderr, "  └─ Error: Section headers are empty.\n     API: `parse_symtab`.\n");
+    return -1;
+  }
+
+  // Shorthand declarations
+  int shdr_count = AccessELF->ehdr->e_shnum;
+
+  /* Find .symtab entry in section headers */
+  int idx, off, size, entSize, nEnt;
+  for (int i = 0; i < shdr_count; i++){
+    if (AccessELF->shdrs[i].sh_type == SHT_SYMTAB){
+      idx = i;
+      off = AccessELF->shdrs[i].sh_offset;
+      size = AccessELF->shdrs[i].sh_size;
+      entSize = AccessELF->shdrs[i].sh_entsize;
+    }
+  }
+  nEnt = size/entSize;
+
+  AccessELF->symtab = malloc(size);
+  if (!AccessELF->symtab){
+    fprintf(stderr, "  └─ Error: `malloc` failed for `symtab`.\n    API: `parse_symtab`\n");
+    return -1;
+  }
+
+  fseek(f_obj, off, SEEK_SET);
+  if (fread(AccessELF->symtab, entSize, nEnt, f_obj) != nEnt){
+    fprintf(stderr, "  └─ Error: failed to parse .symtab\n     API: `parse_symtab`\n");
+
+    free(AccessELF->symtab);
+    AccessELF->symtab = NULL;
+    return -1;
+  }
+
+  return 0;
+}

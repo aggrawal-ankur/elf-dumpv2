@@ -21,6 +21,8 @@ typedef struct {
   char** f_strtab;          // formatted dump of string table
   int f_str_count;          // └─ count of total individual entries
 
+  Elf64_Sym* symtab;        // Symbol Table
+
 } ElfFile;
 
 int parse_ehdr(FILE* f_obj, ElfFile* AccessFile);
@@ -28,5 +30,6 @@ int parse_phdrs(FILE* f_obj, ElfFile* AccessFile);
 int parse_shdrs(FILE* f_obj, ElfFile* AccessFile);
 int parse_shstrtab(FILE* f_obj, ElfFile* AccessFile);
 int parse_strtab(FILE* f_obj, ElfFile* AccessFile);
+int parse_symtab(FILE* f_obj, ElfFile* AccessFile);
 
 #endif

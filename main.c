@@ -68,6 +68,12 @@ int main(int argc, char *argv[]){
   }
   printf("  String table parsed successfully.\n");
 
+  printf("Parsing symbol table.\n");
+  if (parse_symtab(f_obj, AccessELF) != 0){
+    fprintf(stderr, "Error: .symtab can not be parsed.\n");
+    return -1;
+  }
+
   fclose(f_obj);
   return 0;
 }
