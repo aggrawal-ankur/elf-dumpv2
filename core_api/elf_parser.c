@@ -354,17 +354,19 @@ int parse_relocations(FILE* f_obj, ElfFile* AccessELF){
   int dyn_idx, dyn_off, dyn_size, dyn_entSize, dyn_nEnt;
   int plt_idx, plt_off, plt_size, plt_entSize, plt_nEnt;
   for (int i = 0; i < shdr_count; i++){
-    if (AccessELF->shdrs[i].sh_type == SHT_RELA){
+    if ((AccessELF->shdrs[i].sh_type == SHT_RELA) && (strcmp(AccessELF->f_shstrtab[i], ".rela.dyn") == 0)){
+      // printf("here\n");
       dyn_idx = i;
       dyn_off = AccessELF->shdrs[dyn_idx].sh_offset;
       dyn_size = AccessELF->shdrs[dyn_idx].sh_size;
       dyn_entSize = AccessELF->shdrs[dyn_idx].sh_entsize;
+    }
 
-      plt_idx = i+1;
+    if ((AccessELF->shdrs[i].sh_type == SHT_RELA) && (strcmp(AccessELF->f_shstrtab[i], ".rela.plt") == 0)){
+      plt_idx = i;
       plt_off = AccessELF->shdrs[plt_idx].sh_offset;
       plt_size = AccessELF->shdrs[plt_idx].sh_size;
       plt_entSize = AccessELF->shdrs[plt_idx].sh_entsize;
-      break;
     }
   }
   dyn_nEnt = dyn_size/dyn_entSize;
