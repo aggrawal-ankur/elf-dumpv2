@@ -3,7 +3,7 @@
 #include <string.h>
 #include "core_api/verify_elf.h"
 #include "core_api/elf_parser.h"
-#include "raw_interp/raw_shstrtab.h"
+#include "./raw_interp/ehdr.h"
 
 int main(int argc, char *argv[]){
   if (argc != 2){
@@ -104,8 +104,16 @@ int main(int argc, char *argv[]){
   printf("  Dynamic section parsed successfully.\n");
 
   fclose(f_obj);
-  return 0;
+  // return 0;
 
-  // PHASE 1 COMPLETED.
-  // core_api IS COMPLETED.
+  // PHASE 1 COMPLETED ON 31 JULY 2025.
+  // core_api WRITTEN.
+
+  printf("Calling ehdr interpreter....\n");
+  if (raw_ehdr(AccessELF) != 0){
+    fprintf(stderr, "  Error: `raw_ehdr` failed.\n");
+    return -1;
+  }
+  printf("ehdr dump ready!\n");
+  return 0;
 }

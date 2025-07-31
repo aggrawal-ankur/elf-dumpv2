@@ -19,21 +19,21 @@ int raw_ehdr(ElfFile* AccessFile){
 
   fprintf(f_obj, "/* ELF file header (ehdr) dump */\n");
   fprintf(f_obj, "Elf64_Ehdr ehdr = {\n");
-  
-  fprintf(f_obj, "  /* e_ident[16] */     { ");
+
+  fprintf(f_obj, "  /* e_ident[16] */     {\n    ");
   for (int i = 0; i < 16; i++){
     fprintf(f_obj, "0x%02x%s", AccessFile->ehdr->e_ident[i], (i == 15) ? "" : ", ");
   }
-  fprintf(f_obj, "},\n");
+  fprintf(f_obj, "\n  },\n");
   fprintf(f_obj, "  /* e_type      */     %" PRIu16 ",\n", AccessFile->ehdr->e_type);
   fprintf(f_obj, "  /* e_machine   */     %" PRIu16 ",\n", AccessFile->ehdr->e_machine);
   fprintf(f_obj, "  /* e_version   */     %" PRIu32 ",\n", AccessFile->ehdr->e_version);
   fprintf(f_obj, "  /* e_ehsize    */     %" PRIu16 "       /* size in decimal bytes */,\n", AccessFile->ehdr->e_ehsize);
-  fprintf(f_obj, "  /* e_entry     */     %" PRIu64 ",    /* in decimal */\n", AccessFile->ehdr->e_entry);
-  fprintf(f_obj, "  /* e_phoff     */     %" PRIu64 "       /* in decimal */,\n", AccessFile->ehdr->e_phoff);
+  fprintf(f_obj, "  /* e_entry     */     %" PRIu64 ",    /* bytes (in decimal) in the binary */\n", AccessFile->ehdr->e_entry);
+  fprintf(f_obj, "  /* e_phoff     */     %" PRIu64 "       /* bytes (in decimal) in the binary */,\n", AccessFile->ehdr->e_phoff);
   fprintf(f_obj, "  /* e_phnum     */     %" PRIu16 ",\n", AccessFile->ehdr->e_phnum);
   fprintf(f_obj, "  /* e_phentsize */     %" PRIu16 "       /* size in decimal bytes */,\n", AccessFile->ehdr->e_phentsize);
-  fprintf(f_obj, "  /* e_shoff     */     %" PRIu64 "    /* in decimal */,\n", AccessFile->ehdr->e_shoff);
+  fprintf(f_obj, "  /* e_shoff     */     %" PRIu64 "    /* bytes (in decimal) in the binary */,\n", AccessFile->ehdr->e_shoff);
   fprintf(f_obj, "  /* e_shnum     */     %" PRIu16 ",\n", AccessFile->ehdr->e_shnum);
   fprintf(f_obj, "  /* e_shentsize */     %" PRIu16 ",      /* size in decimal bytes */\n", AccessFile->ehdr->e_shentsize);
   fprintf(f_obj, "  /* e_shstrndx  */     %" PRIu16 ",\n", AccessFile->ehdr->e_shstrndx);
