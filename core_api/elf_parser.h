@@ -23,6 +23,8 @@ typedef struct {
 
   Elf64_Sym* symtab;        // Symbol Table
   Elf64_Sym* dynsym;        // Dynamic Symbol Table
+  Elf64_Rela* reladyn;      // .rela.dyn Table
+  Elf64_Rela* relaplt;      // .rela.plt Table
 
 } ElfFile;
 
@@ -33,5 +35,6 @@ int parse_shstrtab(FILE* f_obj, ElfFile* AccessFile);
 int parse_strtab(FILE* f_obj, ElfFile* AccessFile);
 int parse_symtab(FILE* f_obj, ElfFile* AccessFile);
 int parse_dynsym(FILE* f_obj, ElfFile* AccessELF);
+int parse_relocations(FILE* f_obj, ElfFile* AccessELF);
 
 #endif

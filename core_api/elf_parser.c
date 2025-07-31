@@ -335,3 +335,70 @@ int parse_dynsym(FILE* f_obj, ElfFile* AccessELF){
 
   return 0;
 }
+
+int parse_relocations(FILE* f_obj, ElfFile* AccessELF){
+  if (!(&AccessELF->ehdr)){
+    fprintf(stderr, "  └─ Error: File headers are empty.\n     API: `parse_dynsym`.\n");
+    return -1;
+  }
+
+  if (!(&AccessELF->shdrs)){
+    fprintf(stderr, "  └─ Error: Section headers are empty.\n     API: `parse_dynsym`.\n");
+    return -1;
+  }
+
+  // Shorthand declarations
+  int shdr_count = AccessELF->ehdr->e_shnum;
+
+  /* Finding relocation tables in shdrs */
+  int dyn_idx, dyn_off, dyn_size, dyn_entSize, dyn_nEnt;
+  int plt_idx, plt_off, plt_size, plt_entSize, plt_nEnt;
+  for (int i = 0; i < shdr_count; i++){
+    if (AccessELF->shdrs[i].sh_type == SHT_RELA){
+      dyn_idx = i;
+      dyn_off = AccessELF->shdrs[dyn_idx].sh_offset;
+      dyn_size = AccessELF->shdrs[dyn_idx].sh_size;
+      dyn_entSize = AccessELF->shdrs[dyn_idx].sh_entsize;
+
+      plt_idx = i+1;
+      plt_off = AccessELF->shdrs[plt_idx].sh_offset;
+      plt_size = AccessELF->shdrs[plt_idx].sh_size;
+      plt_entSize = AccessELF->shdrs[plt_idx].sh_entsize;
+      break;
+    }
+  }
+  dyn_nEnt = dyn_size/dyn_entSize;
+  plt_nEnt = plt_size/plt_entSize;
+
+  AccessELF->reladyn = malloc(dyn_size);
+  if (!AccessELF->reladyn){
+    fprintf(stderr, "  └─ Error: `malloc` failed for `rela_dyn`.\n     API: `parse_relocations`\n");
+    return -1;
+  }
+
+  fseek(f_obj, dyn_off, SEEK_SET);
+  if (fread(AccessELF->reladyn, dyn_entSize, dyn_nEnt, f_obj) != dyn_nEnt){
+    fprintf(stderr, "  └─ Error: failed to parse .rela.dyn entries.\n     API: `parse_relocations`\n");
+
+    free(AccessELF->reladyn);
+    AccessELF->reladyn = NULL;
+    return -1;
+  }
+
+  AccessELF->relaplt = malloc(plt_size);
+  if (!AccessELF->relaplt){
+    fprintf(stderr, "  └─ Error: `malloc` failed for `relaplt`.\n     API: `parse_relocations`\n");
+    return -1;
+  }
+
+  fseek(f_obj, plt_off, SEEK_SET);
+  if (fread(AccessELF->relaplt, plt_entSize, plt_nEnt, f_obj) != plt_nEnt){
+    fprintf(stderr, "  └─ Error: failed to parse .rela.plt entries.\n     API: `parse_relocations`\n");
+
+    free(AccessELF->relaplt);
+    AccessELF->relaplt = NULL;
+    return -1;
+  }
+
+  return 0;
+}

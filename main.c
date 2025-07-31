@@ -67,20 +67,27 @@ int main(int argc, char *argv[]){
     return -1;
   }
   printf("  String table parsed successfully.\n");
-  
-  printf("Parsing symbol table.\n");
+
+  printf("Parsing symbol table....\n");
   if (parse_symtab(f_obj, AccessELF) != 0){
     fprintf(stderr, "Error: .symtab can not be parsed.\n");
     return -1;
   }
   printf("  Symbol table parsed successfully.\n");
-  
-  printf("Parsing dynamic symbol table.\n");
+
+  printf("Parsing dynamic symbol table....\n");
   if (parse_dynsym(f_obj, AccessELF) != 0){
     fprintf(stderr, "Error: .dynsym can not be parsed.\n");
     return -1;
   }
   printf("  Dynamic symbol table parsed successfully.\n");
+
+  printf("Parsing relocation table....\n");
+  if (parse_relocations(f_obj, AccessELF) != 0){
+    fprintf(stderr, "Error: .rela.* entries can not be parsed.\n");
+    return -1;
+  }
+  printf("  Relocation table parsed successfully.\n");
 
   fclose(f_obj);
   return 0;
