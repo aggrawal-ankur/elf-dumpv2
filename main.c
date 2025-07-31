@@ -105,4 +105,7 @@ int main(int argc, char *argv[]){
 
   fclose(f_obj);
   return 0;
+
+  // PHASE 1 COMPLETED.
+  // core_api IS COMPLETED.
 }
