@@ -25,7 +25,7 @@ int parse_ehdr(FILE* f_obj, ElfFile* AccessELF){
 }
 
 int parse_phdrs(FILE* f_obj, ElfFile* AccessELF){
-  if (!(&AccessELF->ehdr)){
+  if (!AccessELF->ehdr){
     fprintf(stderr, "Error: File headers are empty.\n  API: `parse_phdrs`.\n");
     return -1;
   }
@@ -54,7 +54,7 @@ int parse_phdrs(FILE* f_obj, ElfFile* AccessELF){
 }
 
 int parse_shdrs(FILE* f_obj, ElfFile* AccessELF){
-  if (!(&AccessELF->ehdr)){
+  if (!AccessELF->ehdr){
     fprintf(stderr, "Error: File headers are empty.\n  API: `parse_shdrs`.\n");
     return -1;
   }
@@ -83,12 +83,12 @@ int parse_shdrs(FILE* f_obj, ElfFile* AccessELF){
 }
 
 int parse_shstrtab(FILE* f_obj, ElfFile* AccessELF){
-  if (!(&AccessELF->ehdr)){
+  if (!AccessELF->ehdr){
     fprintf(stderr, "Error: ELF file headers are empty.\n  API: `parse_shstrtab`\n");
     return -1;
   }
 
-  if (!(&AccessELF->shdrs)){
+  if (!AccessELF->shdrs){
     fprintf(stderr, "Error: Section headers are empty.\n API: `parse_shstrtab`\n");
     return -1;
   }
@@ -97,23 +97,23 @@ int parse_shstrtab(FILE* f_obj, ElfFile* AccessELF){
   Elf64_Half shdrs_count = AccessELF->ehdr->e_shnum;
 
   /* Locating section header string table entry in shdrs */
-  int shstr_idx  = AccessELF->ehdr->e_shstrndx;
-  int shstr_off  = AccessELF->shdrs[shstr_idx].sh_offset;
-  int shstr_size = AccessELF->shdrs[shstr_idx].sh_size;
+  int idx  = AccessELF->ehdr->e_shstrndx;
+  int off  = AccessELF->shdrs[idx].sh_offset;
+  int size = AccessELF->shdrs[idx].sh_size;
 
-  fseek(f_obj, shstr_off, SEEK_SET);
+  fseek(f_obj, off, SEEK_SET);
 
   /* Parse section header string table */
 
   // A flat 1-byte array to store section header string table entries.
   // Like this: `s, e, c, t, i, o, n, \0, h, e, a, d, e, r, \0` and so on.
-  AccessELF->r_shstrtab = malloc(shstr_size);
+  AccessELF->r_shstrtab = malloc(size);
   if (!AccessELF->r_shstrtab){
     fprintf(stderr, "Error: `malloc` failed for `r_shstrtab`.\n  API: `parse_shstrtab`\n");
     return -1;
   }
 
-  fread(AccessELF->r_shstrtab, 1, shstr_size, f_obj);
+  fread(AccessELF->r_shstrtab, 1, size, f_obj);
     // Each entry: 1-byte
     // total entries: size
 
@@ -138,14 +138,14 @@ int parse_shstrtab(FILE* f_obj, ElfFile* AccessELF){
     // CHANGE THIS
   }
 
-  AccessELF->r_shstr_count = shstr_size;
+  AccessELF->r_shstr_count = size;
   AccessELF->f_shstr_count = shdrs_count;
 
   return 0;
 }
 
 int parse_strtab(FILE* f_obj, ElfFile* AccessELF){
-  if (!(&AccessELF->ehdr)){
+  if (!AccessELF->ehdr){
     fprintf(stderr, "Error: File headers are empty.\n  API: `parse_strtab`.\n");
     return -1;
   }
@@ -159,19 +159,18 @@ int parse_strtab(FILE* f_obj, ElfFile* AccessELF){
   Elf64_Half shdrs_count = AccessELF->ehdr->e_shnum;
 
   // Extracting metadata about string table
-  int strtab_idx, strtab_off, strtab_size;
-
+  int idx, off, size;
   for (int i = 0; i < shdrs_count; i++){
     int tmp_off = AccessELF->shdrs[i].sh_name;
     if (AccessELF->shdrs[i].sh_type == SHT_STRTAB && (strcmp(&AccessELF->r_shstrtab[tmp_off], ".strtab") == 0)){
-      strtab_idx = i;
-      strtab_off = (AccessELF->shdrs)[strtab_idx].sh_offset;
-      strtab_size = (AccessELF->shdrs)[strtab_idx].sh_size;
+      idx = i;
+      off = (AccessELF->shdrs)[idx].sh_offset;
+      size = (AccessELF->shdrs)[idx].sh_size;
       break;
     }
   }
 
-  if (!strtab_off){
+  if (!off){
     fprintf(stderr, "Error: .strtab can not be found!\n  API: `parse_strtab`\n");
     return -1;
   }
@@ -180,17 +179,17 @@ int parse_strtab(FILE* f_obj, ElfFile* AccessELF){
 
   // A flat 1-byte array to store the string table content in raw form.
   // Like this: `s, e, c, t, i, o, n, \0, h, e, a, d, e, r, \0` and so on.
-  AccessELF->r_strtab = malloc(strtab_size);
+  AccessELF->r_strtab = malloc(size);
   if (!AccessELF->r_strtab){
     fprintf(stderr, "Error: `malloc` failed for `r_strtab`.\n  API: `parse_strtab`\n");
     return -1;
   }
 
-  fread(AccessELF->r_strtab, 1, strtab_size, f_obj);
+  fread(AccessELF->r_strtab, 1, size, f_obj);
 
   // Finding total no. of distinct entries in the string table
   int strtab_ecount = 0;
-  for (int i = 0; i < strtab_size; i++){
+  for (int i = 0; i < size; i++){
     if (AccessELF->r_strtab[i] == '\0'){
       strtab_ecount++;
     }
@@ -205,7 +204,7 @@ int parse_strtab(FILE* f_obj, ElfFile* AccessELF){
 
   int e_cnt = 0;  // entry  counter variable; traversing based on number of entries
   int l_cnt = 0;  // length counter variable; traversing based on the characters in each entry
-  for (int i = 0; i < strtab_size; i++){
+  for (int i = 0; i < size; i++){
     if (AccessELF->r_strtab[i] != '\0'){
       l_cnt++ ;
     }
@@ -243,18 +242,18 @@ int parse_strtab(FILE* f_obj, ElfFile* AccessELF){
 
   /* Export lengths */
   AccessELF->f_str_count = strtab_ecount;
-  AccessELF->r_str_count = strtab_size;
+  AccessELF->r_str_count = size;
 
   return 0;
 }
 
 int parse_symtab(FILE* f_obj, ElfFile* AccessELF){
-  if (!(&AccessELF->ehdr)){
+  if (!AccessELF->ehdr){
     fprintf(stderr, "  └─ Error: File headers are empty.\n     API: `parse_symtab`.\n");
     return -1;
   }
 
-  if (!(&AccessELF->shdrs)){
+  if (!AccessELF->shdrs){
     fprintf(stderr, "  └─ Error: Section headers are empty.\n     API: `parse_symtab`.\n");
     return -1;
   }
@@ -267,12 +266,17 @@ int parse_symtab(FILE* f_obj, ElfFile* AccessELF){
   for (int i = 0; i < shdr_count; i++){
     if (AccessELF->shdrs[i].sh_type == SHT_SYMTAB){
       idx = i;
-      off = AccessELF->shdrs[i].sh_offset;
-      size = AccessELF->shdrs[i].sh_size;
-      entSize = AccessELF->shdrs[i].sh_entsize;
+      off = AccessELF->shdrs[idx].sh_offset;
+      size = AccessELF->shdrs[idx].sh_size;
+      entSize = AccessELF->shdrs[idx].sh_entsize;
     }
   }
   nEnt = size/entSize;
+
+  if (!off){
+    fprintf(stderr, "  └─ Error: .symtab table not found.\n     API: `parse_symtab`\n");
+    return -1;
+  }
 
   AccessELF->symtab = malloc(size);
   if (!AccessELF->symtab){
@@ -295,12 +299,12 @@ int parse_symtab(FILE* f_obj, ElfFile* AccessELF){
 }
 
 int parse_dynsym(FILE* f_obj, ElfFile* AccessELF){
-  if (!(&AccessELF->ehdr)){
+  if (!AccessELF->ehdr){
     fprintf(stderr, "  └─ Error: File headers are empty.\n     API: `parse_dynsym`.\n");
     return -1;
   }
 
-  if (!(&AccessELF->shdrs)){
+  if (!AccessELF->shdrs){
     fprintf(stderr, "  └─ Error: Section headers are empty.\n     API: `parse_dynsym`.\n");
     return -1;
   }
@@ -313,12 +317,17 @@ int parse_dynsym(FILE* f_obj, ElfFile* AccessELF){
   for (int i = 0; i < shdr_count; i++){
     if (AccessELF->shdrs[i].sh_type == SHT_DYNSYM){
       idx = i;
-      off = AccessELF->shdrs[i].sh_offset;
-      size = AccessELF->shdrs[i].sh_size;
-      entSize = AccessELF->shdrs[i].sh_entsize;
+      off = AccessELF->shdrs[idx].sh_offset;
+      size = AccessELF->shdrs[idx].sh_size;
+      entSize = AccessELF->shdrs[idx].sh_entsize;
     }
   }
   nEnt = size/entSize;
+
+  if (!off){
+    fprintf(stderr, "  └─ Error: .dynsym table not found.\n     API: `parse_reocations`\n");
+    return -1;
+  }
 
   AccessELF->dynsym = malloc(size);
   if (!AccessELF->dynsym){
@@ -341,12 +350,12 @@ int parse_dynsym(FILE* f_obj, ElfFile* AccessELF){
 }
 
 int parse_relocations(FILE* f_obj, ElfFile* AccessELF){
-  if (!(&AccessELF->ehdr)){
+  if (!AccessELF->ehdr){
     fprintf(stderr, "  └─ Error: File headers are empty.\n     API: `parse_relocations`.\n");
     return -1;
   }
 
-  if (!(&AccessELF->shdrs)){
+  if (!AccessELF->shdrs){
     fprintf(stderr, "  └─ Error: Section headers are empty.\n     API: `parse_relocations`.\n");
     return -1;
   }
@@ -375,6 +384,15 @@ int parse_relocations(FILE* f_obj, ElfFile* AccessELF){
   }
   dyn_nEnt = dyn_size/dyn_entSize;
   plt_nEnt = plt_size/plt_entSize;
+
+  if (!dyn_off){
+    fprintf(stderr, "  └─ Error: .rela.dyn entries not found.\n     API: `parse_reocations`\n");
+    return -1;
+  }
+  if (!plt_off){
+    fprintf(stderr, "  └─ Error: .rela.plt entries not found.\n     API: `parse_reocations`\n");
+    return -1;
+  }
 
   AccessELF->reladyn = malloc(dyn_size);
   if (!AccessELF->reladyn){
@@ -413,7 +431,7 @@ int parse_relocations(FILE* f_obj, ElfFile* AccessELF){
 }
 
 int parse_dynstr(FILE* f_obj, ElfFile* AccessELF){
-  if (!(&AccessELF->ehdr)){
+  if (!AccessELF->ehdr){
     fprintf(stderr, "Error: File headers are empty.\n  API: `parse_dynstr`.\n");
     return -1;
   }
@@ -434,6 +452,11 @@ int parse_dynstr(FILE* f_obj, ElfFile* AccessELF){
       off  = AccessELF->shdrs[i].sh_offset;
       size = AccessELF->shdrs[i].sh_size;
     }
+  }
+
+  if (!off){
+    fprintf(stderr, "  └─ Error: .dynstr table not found.\n     API: `parse_dynstr`\n");
+    return -1;
   }
 
   AccessELF->r_dynstr = malloc(size);
@@ -500,12 +523,12 @@ int parse_dynstr(FILE* f_obj, ElfFile* AccessELF){
 }
 
 int parse_dynamic(FILE* f_obj, ElfFile* AccessELF){
-  if (!(&AccessELF->ehdr)){
+  if (!AccessELF->ehdr){
     fprintf(stderr, "  └─ Error: ELF file headers are empty.\n  API: `parse_dynamic`\n");
     return -1;
   }
 
-  if (!(&AccessELF->shdrs)){
+  if (!AccessELF->shdrs){
     fprintf(stderr, "  └─ Error: Section headers are empty.\n API: `parse_dynamic`\n");
     return -1;
   }
@@ -524,6 +547,11 @@ int parse_dynamic(FILE* f_obj, ElfFile* AccessELF){
     }
   }
   int nEnt = size/entSize;
+
+  if (!off){
+    fprintf(stderr, "  └─ Error: .rela.dyn entries not found.\n     API: `parse_reocations`\n");
+    return -1;
+  }
 
   AccessELF->dynamic = malloc(size);
   if (!AccessELF->dynamic){
