@@ -31,7 +31,7 @@ int parse_phdrs(FILE* f_obj, ElfFile* AccessELF){
   }
 
   // Shorthand declarations
-  Elf64_Off phoff = AccessELF->ehdr->e_phoff;
+  Elf64_Off  phoff = AccessELF->ehdr->e_phoff;
   Elf64_Half phentsize = AccessELF->ehdr->e_phentsize;
   Elf64_Half phnum = AccessELF->ehdr->e_phnum;
 
@@ -60,7 +60,7 @@ int parse_shdrs(FILE* f_obj, ElfFile* AccessELF){
   }
 
   // Shorthand declarations
-  Elf64_Off shoff = AccessELF->ehdr->e_shoff;
+  Elf64_Off  shoff = AccessELF->ehdr->e_shoff;
   Elf64_Half shnum = AccessELF->ehdr->e_shnum;
   Elf64_Half shentsize = AccessELF->ehdr->e_shentsize;
 
@@ -170,7 +170,7 @@ int parse_strtab(FILE* f_obj, ElfFile* AccessELF){
     }
   }
 
-  if (!off){
+  if (idx < 0 && idx > shdrs_count){
     fprintf(stderr, "Error: .strtab can not be found!\n  API: `parse_strtab`\n");
     return -1;
   }
@@ -259,11 +259,11 @@ int parse_symtab(FILE* f_obj, ElfFile* AccessELF){
   }
 
   // Shorthand declarations
-  int shdr_count = AccessELF->ehdr->e_shnum;
+  int shdrs_count = AccessELF->ehdr->e_shnum;
 
   /* Find .symtab entry in section headers */
   int idx, off, size, entSize, nEnt;
-  for (int i = 0; i < shdr_count; i++){
+  for (int i = 0; i < shdrs_count; i++){
     if (AccessELF->shdrs[i].sh_type == SHT_SYMTAB){
       idx = i;
       off = AccessELF->shdrs[idx].sh_offset;
@@ -273,14 +273,14 @@ int parse_symtab(FILE* f_obj, ElfFile* AccessELF){
   }
   nEnt = size/entSize;
 
-  if (!off){
+  if (idx < 0 && idx > shdrs_count){
     fprintf(stderr, "  └─ Error: .symtab table not found.\n     API: `parse_symtab`\n");
     return -1;
   }
 
   AccessELF->symtab = malloc(size);
   if (!AccessELF->symtab){
-    fprintf(stderr, "  └─ Error: `malloc` failed for `.symtab`.\n    API: `parse_symtab`\n");
+    fprintf(stderr, "  └─ Error: `malloc` failed for `.symtab`.\n     API: `parse_symtab`\n");
     return -1;
   }
 
@@ -310,11 +310,11 @@ int parse_dynsym(FILE* f_obj, ElfFile* AccessELF){
   }
 
   // Shorthand declarations
-  int shdr_count = AccessELF->ehdr->e_shnum;
+  int shdrs_count = AccessELF->ehdr->e_shnum;
 
   /* Find .dynsym entry in section headers */
   int idx, off, size, entSize, nEnt;
-  for (int i = 0; i < shdr_count; i++){
+  for (int i = 0; i < shdrs_count; i++){
     if (AccessELF->shdrs[i].sh_type == SHT_DYNSYM){
       idx = i;
       off = AccessELF->shdrs[idx].sh_offset;
@@ -324,7 +324,7 @@ int parse_dynsym(FILE* f_obj, ElfFile* AccessELF){
   }
   nEnt = size/entSize;
 
-  if (!off){
+  if (idx < 0 && idx > shdrs_count){
     fprintf(stderr, "  └─ Error: .dynsym table not found.\n     API: `parse_reocations`\n");
     return -1;
   }
@@ -361,12 +361,12 @@ int parse_relocations(FILE* f_obj, ElfFile* AccessELF){
   }
 
   // Shorthand declarations
-  int shdr_count = AccessELF->ehdr->e_shnum;
+  int shdrs_count = AccessELF->ehdr->e_shnum;
 
   /* Finding relocation tables in shdrs */
   int dyn_idx, dyn_off, dyn_size, dyn_entSize, dyn_nEnt;
   int plt_idx, plt_off, plt_size, plt_entSize, plt_nEnt;
-  for (int i = 0; i < shdr_count; i++){
+  for (int i = 0; i < shdrs_count; i++){
     if ((AccessELF->shdrs[i].sh_type == SHT_RELA) && (strcmp(AccessELF->f_shstrtab[i], ".rela.dyn") == 0)){
       // printf("here\n");
       dyn_idx = i;
@@ -454,7 +454,7 @@ int parse_dynstr(FILE* f_obj, ElfFile* AccessELF){
     }
   }
 
-  if (!off){
+  if (idx < 0 && idx > shdrs_count){
     fprintf(stderr, "  └─ Error: .dynstr table not found.\n     API: `parse_dynstr`\n");
     return -1;
   }
@@ -548,7 +548,7 @@ int parse_dynamic(FILE* f_obj, ElfFile* AccessELF){
   }
   int nEnt = size/entSize;
 
-  if (!off){
+  if (idx < 0 && idx > shdrs_count){
     fprintf(stderr, "  └─ Error: .rela.dyn entries not found.\n     API: `parse_reocations`\n");
     return -1;
   }
