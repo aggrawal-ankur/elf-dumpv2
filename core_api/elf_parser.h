@@ -22,10 +22,16 @@ typedef struct {
   int f_str_count;          // └─ count of total individual entries
 
   Elf64_Sym* symtab;        // Symbol Table
+  int symtab_count;         // └─ entry count
+
   Elf64_Sym* dynsym;        // Dynamic Symbol Table
+  int dynsym_count;         // └─ entry count
 
   Elf64_Rela* reladyn;      // .rela.dyn Table
+  int reladyn_count;        // └─ entry count
+
   Elf64_Rela* relaplt;      // .rela.plt Table
+  int relaplt_count;        // └─ entry count
 
   char* r_dynstr;           // flat .dynstr dump
   int r_dstr_count;         // └─ count of total bytes

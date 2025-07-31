@@ -289,6 +289,8 @@ int parse_symtab(FILE* f_obj, ElfFile* AccessELF){
     return -1;
   }
 
+  AccessELF->symtab_count = nEnt;
+
   return 0;
 }
 
@@ -332,6 +334,8 @@ int parse_dynsym(FILE* f_obj, ElfFile* AccessELF){
     AccessELF->dynsym = NULL;
     return -1;
   }
+
+  AccessELF->dynsym_count = nEnt;
 
   return 0;
 }
@@ -401,6 +405,9 @@ int parse_relocations(FILE* f_obj, ElfFile* AccessELF){
     AccessELF->relaplt = NULL;
     return -1;
   }
+
+  AccessELF->reladyn_count = dyn_nEnt;
+  AccessELF->relaplt_count = plt_nEnt;
 
   return 0;
 }
