@@ -338,12 +338,12 @@ int parse_dynsym(FILE* f_obj, ElfFile* AccessELF){
 
 int parse_relocations(FILE* f_obj, ElfFile* AccessELF){
   if (!(&AccessELF->ehdr)){
-    fprintf(stderr, "  └─ Error: File headers are empty.\n     API: `parse_dynsym`.\n");
+    fprintf(stderr, "  └─ Error: File headers are empty.\n     API: `parse_relocations`.\n");
     return -1;
   }
 
   if (!(&AccessELF->shdrs)){
-    fprintf(stderr, "  └─ Error: Section headers are empty.\n     API: `parse_dynsym`.\n");
+    fprintf(stderr, "  └─ Error: Section headers are empty.\n     API: `parse_relocations`.\n");
     return -1;
   }
 
@@ -407,12 +407,12 @@ int parse_relocations(FILE* f_obj, ElfFile* AccessELF){
 
 int parse_dynstr(FILE* f_obj, ElfFile* AccessELF){
   if (!(&AccessELF->ehdr)){
-    fprintf(stderr, "Error: File headers are empty.\n  API: `parse_strtab`.\n");
+    fprintf(stderr, "Error: File headers are empty.\n  API: `parse_dynstr`.\n");
     return -1;
   }
 
   if (!AccessELF->r_shstrtab){
-    fprintf(stderr, "Error: Raw section header string table is empty.\n  API: `parse_strtab`.\n");
+    fprintf(stderr, "Error: Raw section header string table is empty.\n  API: `parse_dynstr`.\n");
     return -1;
   }
 
@@ -488,6 +488,51 @@ int parse_dynstr(FILE* f_obj, ElfFile* AccessELF){
 
   AccessELF->r_dstr_count = size;
   AccessELF->f_dstr_count = nEnt;
+
+  return 0;
+}
+
+int parse_dynamic(FILE* f_obj, ElfFile* AccessELF){
+  if (!(&AccessELF->ehdr)){
+    fprintf(stderr, "  └─ Error: ELF file headers are empty.\n  API: `parse_dynamic`\n");
+    return -1;
+  }
+
+  if (!(&AccessELF->shdrs)){
+    fprintf(stderr, "  └─ Error: Section headers are empty.\n API: `parse_dynamic`\n");
+    return -1;
+  }
+
+  // Shorthand declarations
+  Elf64_Half shdrs_count = AccessELF->ehdr->e_shnum;
+
+  /* Find where it is */
+  int idx, off, size, entSize;
+  for (int i = 0; i < shdrs_count; i++){
+    if (AccessELF->shdrs[i].sh_type == SHT_DYNAMIC){
+      idx  = i;
+      off  = AccessELF->shdrs[i].sh_offset;
+      size = AccessELF->shdrs[i].sh_size;
+      entSize = AccessELF->shdrs[i].sh_entsize;
+    }
+  }
+  int nEnt = size/entSize;
+
+  AccessELF->dynamic = malloc(size);
+  if (!AccessELF->dynamic){
+    fprintf(stderr, "  └─ Erro: `malloc` failed for `dynamic`.\n     API: `parse_dynamic`\n");
+    return -1;
+  }
+
+  fseek(f_obj, off, SEEK_SET);
+  if (fread(AccessELF->dynamic, entSize, nEnt, f_obj) != nEnt){
+    fprintf(stderr, "  └─ Error: `fread` failed to read .dynamic.\n     API: `parse_dynamic`\n");
+
+    free(AccessELF->dynamic);
+    AccessELF->dynamic = NULL;
+    return -1;
+  }
+  AccessELF->dyn_ent = nEnt;
 
   return 0;
 }

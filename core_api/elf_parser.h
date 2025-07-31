@@ -23,6 +23,7 @@ typedef struct {
 
   Elf64_Sym* symtab;        // Symbol Table
   Elf64_Sym* dynsym;        // Dynamic Symbol Table
+
   Elf64_Rela* reladyn;      // .rela.dyn Table
   Elf64_Rela* relaplt;      // .rela.plt Table
 
@@ -32,6 +33,8 @@ typedef struct {
   char** f_dynstr;          // formatted dump of .dynstr table
   int f_dstr_count;         // └─ count of total individual entries
 
+  Elf64_Dyn* dynamic;       // Dynamic Section
+  int dyn_ent;              // └─ entry count
 } ElfFile;
 
 int parse_ehdr(FILE* f_obj, ElfFile* AccessFile);
@@ -43,5 +46,6 @@ int parse_symtab(FILE* f_obj, ElfFile* AccessFile);
 int parse_dynsym(FILE* f_obj, ElfFile* AccessELF);
 int parse_relocations(FILE* f_obj, ElfFile* AccessELF);
 int parse_dynstr(FILE* f_obj, ElfFile* AccessELF);
+int parse_dynamic(FILE* f_obj, ElfFile* AccessELF);
 
 #endif
