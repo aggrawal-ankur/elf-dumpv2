@@ -89,6 +89,13 @@ int main(int argc, char *argv[]){
   }
   printf("  Relocation table parsed successfully.\n");
 
+  printf("Parsing dynamic string table....\n");
+  if (parse_dynstr(f_obj, AccessELF) != 0){
+    fprintf(stderr, "  └─ Error: .dynstr entries can not be parsed.\n");
+    return -1;
+  }
+  printf("  Dynamic string table parsed successfully.\n");
+
   fclose(f_obj);
   return 0;
 }

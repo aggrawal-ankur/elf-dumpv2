@@ -404,3 +404,90 @@ int parse_relocations(FILE* f_obj, ElfFile* AccessELF){
 
   return 0;
 }
+
+int parse_dynstr(FILE* f_obj, ElfFile* AccessELF){
+  if (!(&AccessELF->ehdr)){
+    fprintf(stderr, "Error: File headers are empty.\n  API: `parse_strtab`.\n");
+    return -1;
+  }
+
+  if (!AccessELF->r_shstrtab){
+    fprintf(stderr, "Error: Raw section header string table is empty.\n  API: `parse_strtab`.\n");
+    return -1;
+  }
+
+  // Shorthand declarations
+  Elf64_Half shdrs_count = AccessELF->ehdr->e_shnum;
+
+  // Extract metadata about .dynstr
+  int idx, off, size;
+  for (int i = 0; i < shdrs_count; i++){
+    if (AccessELF->shdrs[i].sh_type == SHT_STRTAB && (strcmp(AccessELF->f_shstrtab[i] , ".dynstr") == 0)){
+      idx  = i;
+      off  = AccessELF->shdrs[i].sh_offset;
+      size = AccessELF->shdrs[i].sh_size;
+    }
+  }
+
+  AccessELF->r_dynstr = malloc(size);
+  if (!&AccessELF->r_dynstr){
+    fprintf(stderr, "  └─ Error: malloc failed for `r_dynstr`\n     API: `parse_dynstr`\n");
+    return -1;
+  }
+
+  fseek(f_obj, off, SEEK_SET);
+  if (fread(AccessELF->r_dynstr, 1, size, f_obj) != size){
+    fprintf(stderr, "  └─ Error: `fread` failed to parse .dynstr\n     API: `parse_dynstr`\n");
+
+    free(AccessELF->r_dynstr);
+    AccessELF->r_dynstr = NULL;
+    return -1;
+  }
+
+  int nEnt = 0;
+  for (int i = 0; i < size; i++){
+    if (AccessELF->r_dynstr[i] == '\0'){
+      nEnt++ ;
+    }
+  }
+
+  int e_cnt = 0;
+  int len_cnt = 0;
+  int* entSizes = malloc(size);
+  for (int i = 0; i < size; i++){
+    if (AccessELF->r_dynstr[i] != '\0'){
+      len_cnt++ ;
+    }
+    else{
+      entSizes[e_cnt] = len_cnt;
+      e_cnt++;
+      len_cnt = 0;
+    }
+  }
+
+  /* Formatted .dynstr */
+  AccessELF->f_dynstr = malloc(nEnt * sizeof(char*));
+  if (!&AccessELF->f_dynstr){
+    fprintf(stderr, "  └─ Error: `malloc` failed for `f_dynstr`.\n     API: `parse_dynstr`\n");
+    return -1;
+  }
+
+  char *temp = AccessELF->r_dynstr;
+  for (int i = 0; i < nEnt; i++){
+    AccessELF->f_dynstr[i] = malloc(entSizes[i] + 1);
+
+    int j = 0;
+    for (j; *temp != '\0' ;j++){
+      AccessELF->f_dynstr[i][j] = *temp;
+      temp++ ;
+    }
+    AccessELF->f_dynstr[i][j] = '\0';
+
+    temp++ ;
+  }
+
+  AccessELF->r_dstr_count = size;
+  AccessELF->f_dstr_count = nEnt;
+
+  return 0;
+}

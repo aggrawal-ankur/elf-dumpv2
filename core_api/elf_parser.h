@@ -26,6 +26,12 @@ typedef struct {
   Elf64_Rela* reladyn;      // .rela.dyn Table
   Elf64_Rela* relaplt;      // .rela.plt Table
 
+  char* r_dynstr;           // flat .dynstr dump
+  int r_dstr_count;         // └─ count of total bytes
+
+  char** f_dynstr;          // formatted dump of .dynstr table
+  int f_dstr_count;         // └─ count of total individual entries
+
 } ElfFile;
 
 int parse_ehdr(FILE* f_obj, ElfFile* AccessFile);
@@ -36,5 +42,6 @@ int parse_strtab(FILE* f_obj, ElfFile* AccessFile);
 int parse_symtab(FILE* f_obj, ElfFile* AccessFile);
 int parse_dynsym(FILE* f_obj, ElfFile* AccessELF);
 int parse_relocations(FILE* f_obj, ElfFile* AccessELF);
+int parse_dynstr(FILE* f_obj, ElfFile* AccessELF);
 
 #endif
