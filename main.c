@@ -3,7 +3,7 @@
 #include <string.h>
 #include "core_api/verify_elf.h"
 #include "core_api/elf_parser.h"
-#include "./raw_interp/ehdr.h"
+#include "./dump_structure/ehdr.h"
 
 int main(int argc, char *argv[]){
   if (argc != 2){
@@ -110,7 +110,7 @@ int main(int argc, char *argv[]){
   // core_api WRITTEN.
 
   printf("Calling ehdr interpreter....\n");
-  if (raw_ehdr(AccessELF) != 0){
+  if (dump_ehdr(AccessELF) != 0){
     fprintf(stderr, "  Error: `raw_ehdr` failed.\n");
     return -1;
   }
