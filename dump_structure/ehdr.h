@@ -13,6 +13,7 @@ struct Machines {
   const char *macro;
 };
 
+int general_dump();
 int dump_ehdr(ElfFile* AccessFile);
 
 #endif
