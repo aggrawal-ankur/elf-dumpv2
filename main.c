@@ -111,7 +111,7 @@ int main(int argc, char *argv[]){
 
   printf("Calling ehdr interpreter....\n");
   if (dump_ehdr(AccessELF) != 0){
-    fprintf(stderr, "  Error: `raw_ehdr` failed.\n");
+    fprintf(stderr, "  Error: `dump_ehdr` failed.\n");
     return -1;
   }
   printf("ehdr dump ready!\n");
