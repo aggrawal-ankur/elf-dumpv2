@@ -47,7 +47,7 @@ int dump_phdrs(ElfFile* AccessFile){
   for (int i = 0; i < AccessFile->ehdr->e_phnum; i++){
     fprintf(f_obj, "  {\n");
 
-    for (int j = 0; j < AccessFile->ehdr->e_phnum; j++){
+    for (int j = 0; j < 22; j++){
       if (AccessFile->phdrs[i].p_type == types[j].value){
         fprintf(f_obj, "    /* p_type      */     %" PRIu32 "      /* %s */,\n", AccessFile->phdrs[i].p_type, types[j].macro);
         break;
