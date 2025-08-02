@@ -159,7 +159,7 @@ int parse_strtab(FILE* f_obj, ElfFile* AccessELF){
   Elf64_Half shdrs_count = AccessELF->ehdr->e_shnum;
 
   // Extracting metadata about string table
-  int idx, off, size;
+  int idx = -1, off = 0, size = 0;
   for (int i = 0; i < shdrs_count; i++){
     int tmp_off = AccessELF->shdrs[i].sh_name;
     if (AccessELF->shdrs[i].sh_type == SHT_STRTAB && (strcmp(&AccessELF->r_shstrtab[tmp_off], ".strtab") == 0)){
@@ -170,7 +170,7 @@ int parse_strtab(FILE* f_obj, ElfFile* AccessELF){
     }
   }
 
-  if (idx < 0 && idx > shdrs_count){
+  if (idx < 0 || idx > shdrs_count){
     fprintf(stderr, "Error: .strtab can not be found!\n  API: `parse_strtab`\n");
     return -1;
   }
@@ -185,6 +185,7 @@ int parse_strtab(FILE* f_obj, ElfFile* AccessELF){
     return -1;
   }
 
+  fseek(f_obj, off, SEEK_SET);
   fread(AccessELF->r_strtab, 1, size, f_obj);
 
   // Finding total no. of distinct entries in the string table
@@ -235,7 +236,7 @@ int parse_strtab(FILE* f_obj, ElfFile* AccessELF){
       AccessELF->f_strtab[i][j] = *temp;
       temp++;
     }
-    AccessELF->f_strtab[i][j++] = '\0';
+    AccessELF->f_strtab[i][j] = '\0';
 
     temp++;
   }
@@ -262,7 +263,7 @@ int parse_symtab(FILE* f_obj, ElfFile* AccessELF){
   int shdrs_count = AccessELF->ehdr->e_shnum;
 
   /* Find .symtab entry in section headers */
-  int idx, off, size, entSize, nEnt;
+  int idx = -1, off = 0, size = 0, entSize = 0, nEnt = 0;
   for (int i = 0; i < shdrs_count; i++){
     if (AccessELF->shdrs[i].sh_type == SHT_SYMTAB){
       idx = i;
@@ -273,7 +274,7 @@ int parse_symtab(FILE* f_obj, ElfFile* AccessELF){
   }
   nEnt = size/entSize;
 
-  if (idx < 0 && idx > shdrs_count){
+  if (idx < 0 || idx > shdrs_count){
     fprintf(stderr, "  └─ Error: .symtab table not found.\n     API: `parse_symtab`\n");
     return -1;
   }
@@ -313,7 +314,7 @@ int parse_dynsym(FILE* f_obj, ElfFile* AccessELF){
   int shdrs_count = AccessELF->ehdr->e_shnum;
 
   /* Find .dynsym entry in section headers */
-  int idx, off, size, entSize, nEnt;
+  int idx = -1, off = 0, size = 0, entSize = 0, nEnt = 0;
   for (int i = 0; i < shdrs_count; i++){
     if (AccessELF->shdrs[i].sh_type == SHT_DYNSYM){
       idx = i;
@@ -324,7 +325,7 @@ int parse_dynsym(FILE* f_obj, ElfFile* AccessELF){
   }
   nEnt = size/entSize;
 
-  if (idx < 0 && idx > shdrs_count){
+  if (idx < 0 || idx > shdrs_count){
     fprintf(stderr, "  └─ Error: .dynsym table not found.\n     API: `parse_reocations`\n");
     return -1;
   }
@@ -445,7 +446,7 @@ int parse_dynstr(FILE* f_obj, ElfFile* AccessELF){
   Elf64_Half shdrs_count = AccessELF->ehdr->e_shnum;
 
   // Extract metadata about .dynstr
-  int idx, off, size;
+  int idx = -1, off = 0, size = 0;
   for (int i = 0; i < shdrs_count; i++){
     if (AccessELF->shdrs[i].sh_type == SHT_STRTAB && (strcmp(AccessELF->f_shstrtab[i] , ".dynstr") == 0)){
       idx  = i;
@@ -454,7 +455,7 @@ int parse_dynstr(FILE* f_obj, ElfFile* AccessELF){
     }
   }
 
-  if (idx < 0 && idx > shdrs_count){
+  if (idx < 0 || idx > shdrs_count){
     fprintf(stderr, "  └─ Error: .dynstr table not found.\n     API: `parse_dynstr`\n");
     return -1;
   }
@@ -537,7 +538,7 @@ int parse_dynamic(FILE* f_obj, ElfFile* AccessELF){
   Elf64_Half shdrs_count = AccessELF->ehdr->e_shnum;
 
   /* Find where it is */
-  int idx, off, size, entSize;
+  int idx = -1, off = 0, size = 0, entSize = 0;
   for (int i = 0; i < shdrs_count; i++){
     if (AccessELF->shdrs[i].sh_type == SHT_DYNAMIC){
       idx  = i;
@@ -548,7 +549,7 @@ int parse_dynamic(FILE* f_obj, ElfFile* AccessELF){
   }
   int nEnt = size/entSize;
 
-  if (idx < 0 && idx > shdrs_count){
+  if (idx < 0 || idx > shdrs_count){
     fprintf(stderr, "  └─ Error: .rela.dyn entries not found.\n     API: `parse_reocations`\n");
     return -1;
   }

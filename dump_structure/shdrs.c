@@ -96,7 +96,8 @@ int dump_shdrs(ElfFile* AccessFile){
     fprintf(f_obj, "    /* sh_entsize      */     %" PRIu64 "         /* in bytes (decimal) */,\n", AccessFile->shdrs[i].sh_entsize);
     fprintf(f_obj, "  },\n");
   }
-  fprintf(f_obj, "  }\n\n\n");
+  fprintf(f_obj, "};\n\n\n");
 
+  fclose(f_obj);
   return 0;
 }
