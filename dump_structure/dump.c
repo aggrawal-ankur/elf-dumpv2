@@ -221,6 +221,7 @@ int dump_symtab(ElfFile* AccessFile){
 
   for (int i = 0; i < AccessFile->symtab_count; i++){
     fprintf(f_obj, "  {\n");
+    fprintf(f_obj, "    /* looped_idx   */     %d,     /* loop counter */\n", i);
     fprintf(f_obj, "    /* st_name      */     %" PRIu32 ",     /* offset (decimal ) in .strtab */\n\n", AccessFile->symtab[i].st_name);
     fprintf(f_obj, "    /* st_info      */ {          /* %d */\n", AccessFile->symtab[i].st_info);
 
@@ -269,6 +270,7 @@ int dump_dynsym(ElfFile* AccessFile){
 
   for (int i = 0; i < AccessFile->dynsym_count; i++){
     fprintf(f_obj, "  {\n");
+    fprintf(f_obj, "    /* looped_idx   */     %d,     /* loop counter */\n", i);
     fprintf(f_obj, "    /* st_name      */     %" PRIu32 ",     /* offset (decimal ) in .strtab */\n\n", AccessFile->dynsym[i].st_name);
     fprintf(f_obj, "    /* st_info      */ {          /* %d */\n", AccessFile->dynsym[i].st_info);
 

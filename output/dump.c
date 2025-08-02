@@ -631,6 +631,7 @@ char** f_strtab = {
 /* Symbol table (.symtab) dump. */
 Elf64_Sym symtab = {
   {
+    /* looped_idx   */     0,     /* loop counter */
     /* st_name      */     0,     /* offset (decimal ) in .strtab */
 
     /* st_info      */ {          /* 0 */
@@ -644,6 +645,7 @@ Elf64_Sym symtab = {
     /* st_size      */     0,     /* symbol size (in decimal) */
   },
   {
+    /* looped_idx   */     1,     /* loop counter */
     /* st_name      */     1,     /* offset (decimal ) in .strtab */
 
     /* st_info      */ {          /* 4 */
@@ -657,6 +659,7 @@ Elf64_Sym symtab = {
     /* st_size      */     0,     /* symbol size (in decimal) */
   },
   {
+    /* looped_idx   */     2,     /* loop counter */
     /* st_name      */     9,     /* offset (decimal ) in .strtab */
 
     /* st_info      */ {          /* 1 */
@@ -670,6 +673,7 @@ Elf64_Sym symtab = {
     /* st_size      */     32,     /* symbol size (in decimal) */
   },
   {
+    /* looped_idx   */     3,     /* loop counter */
     /* st_name      */     19,     /* offset (decimal ) in .strtab */
 
     /* st_info      */ {          /* 4 */
@@ -683,6 +687,7 @@ Elf64_Sym symtab = {
     /* st_size      */     0,     /* symbol size (in decimal) */
   },
   {
+    /* looped_idx   */     4,     /* loop counter */
     /* st_name      */     30,     /* offset (decimal ) in .strtab */
 
     /* st_info      */ {          /* 2 */
@@ -696,6 +701,7 @@ Elf64_Sym symtab = {
     /* st_size      */     0,     /* symbol size (in decimal) */
   },
   {
+    /* looped_idx   */     5,     /* loop counter */
     /* st_name      */     32,     /* offset (decimal ) in .strtab */
 
     /* st_info      */ {          /* 2 */
@@ -709,6 +715,7 @@ Elf64_Sym symtab = {
     /* st_size      */     0,     /* symbol size (in decimal) */
   },
   {
+    /* looped_idx   */     6,     /* loop counter */
     /* st_name      */     51,     /* offset (decimal ) in .strtab */
 
     /* st_info      */ {          /* 2 */
@@ -722,6 +729,7 @@ Elf64_Sym symtab = {
     /* st_size      */     0,     /* symbol size (in decimal) */
   },
   {
+    /* looped_idx   */     7,     /* loop counter */
     /* st_name      */     73,     /* offset (decimal ) in .strtab */
 
     /* st_info      */ {          /* 1 */
@@ -735,6 +743,7 @@ Elf64_Sym symtab = {
     /* st_size      */     1,     /* symbol size (in decimal) */
   },
   {
+    /* looped_idx   */     8,     /* loop counter */
     /* st_name      */     85,     /* offset (decimal ) in .strtab */
 
     /* st_info      */ {          /* 1 */
@@ -748,6 +757,7 @@ Elf64_Sym symtab = {
     /* st_size      */     0,     /* symbol size (in decimal) */
   },
   {
+    /* looped_idx   */     9,     /* loop counter */
     /* st_name      */     124,     /* offset (decimal ) in .strtab */
 
     /* st_info      */ {          /* 2 */
@@ -761,6 +771,7 @@ Elf64_Sym symtab = {
     /* st_size      */     0,     /* symbol size (in decimal) */
   },
   {
+    /* looped_idx   */     10,     /* loop counter */
     /* st_name      */     136,     /* offset (decimal ) in .strtab */
 
     /* st_info      */ {          /* 1 */
@@ -774,6 +785,7 @@ Elf64_Sym symtab = {
     /* st_size      */     0,     /* symbol size (in decimal) */
   },
   {
+    /* looped_idx   */     11,     /* loop counter */
     /* st_name      */     167,     /* offset (decimal ) in .strtab */
 
     /* st_info      */ {          /* 4 */
@@ -787,6 +799,7 @@ Elf64_Sym symtab = {
     /* st_size      */     0,     /* symbol size (in decimal) */
   },
   {
+    /* looped_idx   */     12,     /* loop counter */
     /* st_name      */     19,     /* offset (decimal ) in .strtab */
 
     /* st_info      */ {          /* 4 */
@@ -800,6 +813,7 @@ Elf64_Sym symtab = {
     /* st_size      */     0,     /* symbol size (in decimal) */
   },
   {
+    /* looped_idx   */     13,     /* loop counter */
     /* st_name      */     181,     /* offset (decimal ) in .strtab */
 
     /* st_info      */ {          /* 1 */
@@ -813,6 +827,7 @@ Elf64_Sym symtab = {
     /* st_size      */     0,     /* symbol size (in decimal) */
   },
   {
+    /* looped_idx   */     14,     /* loop counter */
     /* st_name      */     0,     /* offset (decimal ) in .strtab */
 
     /* st_info      */ {          /* 4 */
@@ -826,6 +841,7 @@ Elf64_Sym symtab = {
     /* st_size      */     0,     /* symbol size (in decimal) */
   },
   {
+    /* looped_idx   */     15,     /* loop counter */
     /* st_name      */     195,     /* offset (decimal ) in .strtab */
 
     /* st_info      */ {          /* 1 */
@@ -839,6 +855,7 @@ Elf64_Sym symtab = {
     /* st_size      */     0,     /* symbol size (in decimal) */
   },
   {
+    /* looped_idx   */     16,     /* loop counter */
     /* st_name      */     204,     /* offset (decimal ) in .strtab */
 
     /* st_info      */ {          /* 0 */
@@ -852,6 +869,7 @@ Elf64_Sym symtab = {
     /* st_size      */     0,     /* symbol size (in decimal) */
   },
   {
+    /* looped_idx   */     17,     /* loop counter */
     /* st_name      */     223,     /* offset (decimal ) in .strtab */
 
     /* st_info      */ {          /* 1 */
@@ -865,6 +883,7 @@ Elf64_Sym symtab = {
     /* st_size      */     0,     /* symbol size (in decimal) */
   },
   {
+    /* looped_idx   */     18,     /* loop counter */
     /* st_name      */     245,     /* offset (decimal ) in .strtab */
 
     /* st_info      */ {          /* 18 */
@@ -878,6 +897,7 @@ Elf64_Sym symtab = {
     /* st_size      */     0,     /* symbol size (in decimal) */
   },
   {
+    /* looped_idx   */     19,     /* loop counter */
     /* st_name      */     274,     /* offset (decimal ) in .strtab */
 
     /* st_info      */ {          /* 32 */
@@ -891,6 +911,7 @@ Elf64_Sym symtab = {
     /* st_size      */     0,     /* symbol size (in decimal) */
   },
   {
+    /* looped_idx   */     20,     /* loop counter */
     /* st_name      */     334,     /* offset (decimal ) in .strtab */
 
     /* st_info      */ {          /* 32 */
@@ -904,6 +925,7 @@ Elf64_Sym symtab = {
     /* st_size      */     0,     /* symbol size (in decimal) */
   },
   {
+    /* looped_idx   */     21,     /* loop counter */
     /* st_name      */     302,     /* offset (decimal ) in .strtab */
 
     /* st_info      */ {          /* 18 */
@@ -917,6 +939,7 @@ Elf64_Sym symtab = {
     /* st_size      */     0,     /* symbol size (in decimal) */
   },
   {
+    /* looped_idx   */     22,     /* loop counter */
     /* st_name      */     319,     /* offset (decimal ) in .strtab */
 
     /* st_info      */ {          /* 16 */
@@ -930,6 +953,7 @@ Elf64_Sym symtab = {
     /* st_size      */     0,     /* symbol size (in decimal) */
   },
   {
+    /* looped_idx   */     23,     /* loop counter */
     /* st_name      */     326,     /* offset (decimal ) in .strtab */
 
     /* st_info      */ {          /* 18 */
@@ -943,6 +967,7 @@ Elf64_Sym symtab = {
     /* st_size      */     0,     /* symbol size (in decimal) */
   },
   {
+    /* looped_idx   */     24,     /* loop counter */
     /* st_name      */     332,     /* offset (decimal ) in .strtab */
 
     /* st_info      */ {          /* 16 */
@@ -956,6 +981,7 @@ Elf64_Sym symtab = {
     /* st_size      */     0,     /* symbol size (in decimal) */
   },
   {
+    /* looped_idx   */     25,     /* loop counter */
     /* st_name      */     345,     /* offset (decimal ) in .strtab */
 
     /* st_info      */ {          /* 32 */
@@ -969,6 +995,7 @@ Elf64_Sym symtab = {
     /* st_size      */     0,     /* symbol size (in decimal) */
   },
   {
+    /* looped_idx   */     26,     /* loop counter */
     /* st_name      */     360,     /* offset (decimal ) in .strtab */
 
     /* st_info      */ {          /* 17 */
@@ -982,6 +1009,7 @@ Elf64_Sym symtab = {
     /* st_size      */     0,     /* symbol size (in decimal) */
   },
   {
+    /* looped_idx   */     27,     /* loop counter */
     /* st_name      */     373,     /* offset (decimal ) in .strtab */
 
     /* st_info      */ {          /* 17 */
@@ -995,6 +1023,7 @@ Elf64_Sym symtab = {
     /* st_size      */     4,     /* symbol size (in decimal) */
   },
   {
+    /* looped_idx   */     28,     /* loop counter */
     /* st_name      */     388,     /* offset (decimal ) in .strtab */
 
     /* st_info      */ {          /* 16 */
@@ -1008,6 +1037,7 @@ Elf64_Sym symtab = {
     /* st_size      */     0,     /* symbol size (in decimal) */
   },
   {
+    /* looped_idx   */     29,     /* loop counter */
     /* st_name      */     338,     /* offset (decimal ) in .strtab */
 
     /* st_info      */ {          /* 18 */
@@ -1021,6 +1051,7 @@ Elf64_Sym symtab = {
     /* st_size      */     34,     /* symbol size (in decimal) */
   },
   {
+    /* looped_idx   */     30,     /* loop counter */
     /* st_name      */     393,     /* offset (decimal ) in .strtab */
 
     /* st_info      */ {          /* 16 */
@@ -1034,6 +1065,7 @@ Elf64_Sym symtab = {
     /* st_size      */     0,     /* symbol size (in decimal) */
   },
   {
+    /* looped_idx   */     31,     /* loop counter */
     /* st_name      */     405,     /* offset (decimal ) in .strtab */
 
     /* st_info      */ {          /* 18 */
@@ -1047,6 +1079,7 @@ Elf64_Sym symtab = {
     /* st_size      */     26,     /* symbol size (in decimal) */
   },
   {
+    /* looped_idx   */     32,     /* loop counter */
     /* st_name      */     410,     /* offset (decimal ) in .strtab */
 
     /* st_info      */ {          /* 17 */
@@ -1060,6 +1093,7 @@ Elf64_Sym symtab = {
     /* st_size      */     0,     /* symbol size (in decimal) */
   },
   {
+    /* looped_idx   */     33,     /* loop counter */
     /* st_name      */     422,     /* offset (decimal ) in .strtab */
 
     /* st_info      */ {          /* 32 */
@@ -1073,6 +1107,7 @@ Elf64_Sym symtab = {
     /* st_size      */     0,     /* symbol size (in decimal) */
   },
   {
+    /* looped_idx   */     34,     /* loop counter */
     /* st_name      */     448,     /* offset (decimal ) in .strtab */
 
     /* st_info      */ {          /* 34 */
@@ -1086,6 +1121,7 @@ Elf64_Sym symtab = {
     /* st_size      */     0,     /* symbol size (in decimal) */
   },
   {
+    /* looped_idx   */     35,     /* loop counter */
     /* st_name      */     475,     /* offset (decimal ) in .strtab */
 
     /* st_info      */ {          /* 18 */
@@ -1104,6 +1140,7 @@ Elf64_Sym symtab = {
 /* Dynamic Symbol table (.dynsym) dump. */
 Elf64_Sym dynsym = {
   {
+    /* looped_idx   */     0,     /* loop counter */
     /* st_name      */     0,     /* offset (decimal ) in .strtab */
 
     /* st_info      */ {          /* 0 */
@@ -1117,6 +1154,7 @@ Elf64_Sym dynsym = {
     /* st_size      */     0,     /* symbol size (in decimal) */
   },
   {
+    /* looped_idx   */     1,     /* loop counter */
     /* st_name      */     6,     /* offset (decimal ) in .strtab */
 
     /* st_info      */ {          /* 18 */
@@ -1130,6 +1168,7 @@ Elf64_Sym dynsym = {
     /* st_size      */     0,     /* symbol size (in decimal) */
   },
   {
+    /* looped_idx   */     2,     /* loop counter */
     /* st_name      */     72,     /* offset (decimal ) in .strtab */
 
     /* st_info      */ {          /* 32 */
@@ -1143,6 +1182,7 @@ Elf64_Sym dynsym = {
     /* st_size      */     0,     /* symbol size (in decimal) */
   },
   {
+    /* looped_idx   */     3,     /* loop counter */
     /* st_name      */     1,     /* offset (decimal ) in .strtab */
 
     /* st_info      */ {          /* 18 */
@@ -1156,6 +1196,7 @@ Elf64_Sym dynsym = {
     /* st_size      */     0,     /* symbol size (in decimal) */
   },
   {
+    /* looped_idx   */     4,     /* loop counter */
     /* st_name      */     100,     /* offset (decimal ) in .strtab */
 
     /* st_info      */ {          /* 32 */
@@ -1169,6 +1210,7 @@ Elf64_Sym dynsym = {
     /* st_size      */     0,     /* symbol size (in decimal) */
   },
   {
+    /* looped_idx   */     5,     /* loop counter */
     /* st_name      */     115,     /* offset (decimal ) in .strtab */
 
     /* st_info      */ {          /* 32 */
@@ -1182,6 +1224,7 @@ Elf64_Sym dynsym = {
     /* st_size      */     0,     /* symbol size (in decimal) */
   },
   {
+    /* looped_idx   */     6,     /* loop counter */
     /* st_name      */     24,     /* offset (decimal ) in .strtab */
 
     /* st_info      */ {          /* 34 */
