@@ -1101,3 +1101,99 @@ Elf64_Sym symtab = {
 };
 
 
+/* Dynamic Symbol table (.dynsym) dump. */
+Elf64_Sym dynsym = {
+  {
+    /* st_name      */     0,     /* offset (decimal ) in .strtab */
+
+    /* st_info      */ {          /* 0 */
+      /* type       */     0,     /* STT_NOTYPE */
+      /* binding    */     0,     /* STB_LOCAL */
+    },
+
+    /* st_other     */     0,     /* symbol visibility, STV_DEFAULT */
+    /* st_shdx      */     0,     /* section (idx) it is present in */
+    /* st_value     */     0,     /* symbol value (in decimal) */
+    /* st_size      */     0,     /* symbol size (in decimal) */
+  },
+  {
+    /* st_name      */     6,     /* offset (decimal ) in .strtab */
+
+    /* st_info      */ {          /* 18 */
+      /* type       */     2,     /* STT_FUNC */
+      /* binding    */     1,     /* STB_GLOBAL */
+    },
+
+    /* st_other     */     0,     /* symbol visibility, STV_DEFAULT */
+    /* st_shdx      */     0,     /* section (idx) it is present in */
+    /* st_value     */     0,     /* symbol value (in decimal) */
+    /* st_size      */     0,     /* symbol size (in decimal) */
+  },
+  {
+    /* st_name      */     72,     /* offset (decimal ) in .strtab */
+
+    /* st_info      */ {          /* 32 */
+      /* type       */     0,     /* STT_NOTYPE */
+      /* binding    */     2,     /* STB_WEAK */
+    },
+
+    /* st_other     */     0,     /* symbol visibility, STV_DEFAULT */
+    /* st_shdx      */     0,     /* section (idx) it is present in */
+    /* st_value     */     0,     /* symbol value (in decimal) */
+    /* st_size      */     0,     /* symbol size (in decimal) */
+  },
+  {
+    /* st_name      */     1,     /* offset (decimal ) in .strtab */
+
+    /* st_info      */ {          /* 18 */
+      /* type       */     2,     /* STT_FUNC */
+      /* binding    */     1,     /* STB_GLOBAL */
+    },
+
+    /* st_other     */     0,     /* symbol visibility, STV_DEFAULT */
+    /* st_shdx      */     0,     /* section (idx) it is present in */
+    /* st_value     */     0,     /* symbol value (in decimal) */
+    /* st_size      */     0,     /* symbol size (in decimal) */
+  },
+  {
+    /* st_name      */     100,     /* offset (decimal ) in .strtab */
+
+    /* st_info      */ {          /* 32 */
+      /* type       */     0,     /* STT_NOTYPE */
+      /* binding    */     2,     /* STB_WEAK */
+    },
+
+    /* st_other     */     0,     /* symbol visibility, STV_DEFAULT */
+    /* st_shdx      */     0,     /* section (idx) it is present in */
+    /* st_value     */     0,     /* symbol value (in decimal) */
+    /* st_size      */     0,     /* symbol size (in decimal) */
+  },
+  {
+    /* st_name      */     115,     /* offset (decimal ) in .strtab */
+
+    /* st_info      */ {          /* 32 */
+      /* type       */     0,     /* STT_NOTYPE */
+      /* binding    */     2,     /* STB_WEAK */
+    },
+
+    /* st_other     */     0,     /* symbol visibility, STV_DEFAULT */
+    /* st_shdx      */     0,     /* section (idx) it is present in */
+    /* st_value     */     0,     /* symbol value (in decimal) */
+    /* st_size      */     0,     /* symbol size (in decimal) */
+  },
+  {
+    /* st_name      */     24,     /* offset (decimal ) in .strtab */
+
+    /* st_info      */ {          /* 34 */
+      /* type       */     2,     /* STT_FUNC */
+      /* binding    */     2,     /* STB_WEAK */
+    },
+
+    /* st_other     */     0,     /* symbol visibility, STV_DEFAULT */
+    /* st_shdx      */     0,     /* section (idx) it is present in */
+    /* st_value     */     0,     /* symbol value (in decimal) */
+    /* st_size      */     0,     /* symbol size (in decimal) */
+  },
+};
+
+

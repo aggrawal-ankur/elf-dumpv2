@@ -69,7 +69,7 @@ int dump_ehdr(ElfFile* AccessFile){
 int dump_phdrs(ElfFile* AccessFile){
   FILE* f_obj = fopen("output/dump.c", "a");
   if (!f_obj){
-    fprintf(stderr, "Error: `f_obj` failed.\n ");
+    fprintf(stderr, "Error: `f_obj` failed.  Inside `dump_phdrs`\n ");
     return -1;
   }
 
@@ -212,7 +212,7 @@ int dump_strtab(ElfFile* AccessELF){
 int dump_symtab(ElfFile* AccessFile){
   FILE* f_obj = fopen("./output/dump.c", "a");
   if (!f_obj){
-    fprintf(stderr, "Error: `f_obj` failed.\n  Inside `dump_ehdr`\n");
+    fprintf(stderr, "Error: `f_obj` failed.\n  Inside `dump_symtab`\n");
     return -1;
   }
 
@@ -257,3 +257,51 @@ int dump_symtab(ElfFile* AccessFile){
   return 0;
 }
 
+
+int dump_dynsym(ElfFile* AccessFile){
+  FILE* f_obj = fopen("./output/dump.c", "a");
+  if (!f_obj){
+    fprintf(stderr, "Error: `f_obj` failed.\n  Inside `dump_dynsym`\n");
+    return -1;
+  }
+
+  fprintf(f_obj, "/* Dynamic Symbol table (.dynsym) dump. */\n");
+  fprintf(f_obj, "Elf64_Sym dynsym = {\n");
+
+  for (int i = 0; i < AccessFile->dynsym_count; i++){
+    fprintf(f_obj, "  {\n");
+    fprintf(f_obj, "    /* st_name      */     %" PRIu32 ",     /* offset (decimal ) in .strtab */\n\n", AccessFile->dynsym[i].st_name);
+    fprintf(f_obj, "    /* st_info      */ {          /* %d */\n", AccessFile->dynsym[i].st_info);
+
+    for (int j = 0; j < 7; j++){
+      if ((AccessFile->dynsym[i].st_info & 0xf) == d_sttypes[j].value){
+        fprintf(f_obj, "      /* type       */     %d,     /* %s */\n", AccessFile->dynsym[i].st_info & 0xf, d_sttypes[j].macro);
+        break;
+      }
+    }
+
+    for (int k = 0; k < 4; k++){
+      if ((AccessFile->dynsym[i].st_info >> 4) == d_stbinds[k].value){
+        fprintf(f_obj, "      /* binding    */     %d,     /* %s */\n", AccessFile->dynsym[i].st_info >> 4, d_stbinds[k].macro);
+        break;
+      }
+    }
+    fprintf(f_obj, "    },\n\n");
+    
+    for (int l = 0; l < 4; l++){
+      if ((AccessFile->dynsym[i].st_other & 0x03) == d_stvisible[l].value){
+        fprintf(f_obj, "    /* st_other     */     %d,     /* symbol visibility, %s */\n", AccessFile->dynsym[i].st_other, d_stvisible[l].macro);
+        break;
+      }
+    }
+
+    fprintf(f_obj, "    /* st_shdx      */     %" PRIu16 ",     /* section (idx) it is present in */\n", AccessFile->dynsym[i].st_shndx);
+    fprintf(f_obj, "    /* st_value     */     %" PRIu64 ",     /* symbol value (in decimal) */\n", AccessFile->dynsym[i].st_value);
+    fprintf(f_obj, "    /* st_size      */     %" PRIu64 ",     /* symbol size (in decimal) */\n", AccessFile->dynsym[i].st_size);
+    fprintf(f_obj, "  },\n");
+  }
+  fprintf(f_obj, "};\n\n\n");
+
+  fclose(f_obj);
+  return 0;
+}
