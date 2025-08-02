@@ -547,43 +547,84 @@ Elf64_Shdr shdrs = {
 
 
 /* Section header string table (.shstrtab) flat-dump. */
-char* shstrtab = {
+char* r_shstrtab = {
   '\0', '.', 's', 'y', 'm', 't', 'a', 'b', '\0', '.', 's', 't', 'r', 't', 'a', 'b', '\0', '.', 's', 'h', 's', 't', 'r', 't', 'a', 'b', '\0', '.', 'n', 'o', 't', 'e', '.', 'g', 'n', 'u', '.', 'p', 'r', 'o', 'p', 'e', 'r', 't', 'y', '\0', '.', 'n', 'o', 't', 'e', '.', 'g', 'n', 'u', '.', 'b', 'u', 'i', 'l', 'd', '-', 'i', 'd', '\0', '.', 'i', 'n', 't', 'e', 'r', 'p', '\0', '.', 'g', 'n', 'u', '.', 'h', 'a', 's', 'h', '\0', '.', 'd', 'y', 'n', 's', 'y', 'm', '\0', '.', 'd', 'y', 'n', 's', 't', 'r', '\0', '.', 'g', 'n', 'u', '.', 'v', 'e', 'r', 's', 'i', 'o', 'n', '\0', '.', 'g', 'n', 'u', '.', 'v', 'e', 'r', 's', 'i', 'o', 'n', '_', 'r', '\0', '.', 'r', 'e', 'l', 'a', '.', 'd', 'y', 'n', '\0', '.', 'r', 'e', 'l', 'a', '.', 'p', 'l', 't', '\0', '.', 'i', 'n', 'i', 't', '\0', '.', 'p', 'l', 't', '.', 'g', 'o', 't', '\0', '.', 't', 'e', 'x', 't', '\0', '.', 'f', 'i', 'n', 'i', '\0', '.', 'r', 'o', 'd', 'a', 't', 'a', '\0', '.', 'e', 'h', '_', 'f', 'r', 'a', 'm', 'e', '_', 'h', 'd', 'r', '\0', '.', 'e', 'h', '_', 'f', 'r', 'a', 'm', 'e', '\0', '.', 'n', 'o', 't', 'e', '.', 'A', 'B', 'I', '-', 't', 'a', 'g', '\0', '.', 'i', 'n', 'i', 't', '_', 'a', 'r', 'r', 'a', 'y', '\0', '.', 'f', 'i', 'n', 'i', '_', 'a', 'r', 'r', 'a', 'y', '\0', '.', 'd', 'y', 'n', 'a', 'm', 'i', 'c', '\0', '.', 'g', 'o', 't', '.', 'p', 'l', 't', '\0', '.', 'd', 'a', 't', 'a', '\0', '.', 'b', 's', 's', '\0', '.', 'c', 'o', 'm', 'm', 'e', 'n', 't', '\0', 
 };
 
 /* Section header string table (.shstrtab) formatted-dump. */
-char** shstrtab = {
-  {""},
-  {".note.gnu.property"},
-  {".note.gnu.build-id"},
-  {".interp"},
-  {".gnu.hash"},
-  {".dynsym"},
-  {".dynstr"},
-  {".gnu.version"},
-  {".gnu.version_r"},
-  {".rela.dyn"},
-  {".rela.plt"},
-  {".init"},
-  {".plt"},
-  {".plt.got"},
-  {".text"},
-  {".fini"},
-  {".rodata"},
-  {".eh_frame_hdr"},
-  {".eh_frame"},
-  {".note.ABI-tag"},
-  {".init_array"},
-  {".fini_array"},
-  {".dynamic"},
-  {".got"},
-  {".got.plt"},
-  {".data"},
-  {".bss"},
-  {".comment"},
-  {".symtab"},
-  {".strtab"},
-  {".shstrtab"},
+char** f_shstrtab = {
+  "",
+  ".note.gnu.property",
+  ".note.gnu.build-id",
+  ".interp",
+  ".gnu.hash",
+  ".dynsym",
+  ".dynstr",
+  ".gnu.version",
+  ".gnu.version_r",
+  ".rela.dyn",
+  ".rela.plt",
+  ".init",
+  ".plt",
+  ".plt.got",
+  ".text",
+  ".fini",
+  ".rodata",
+  ".eh_frame_hdr",
+  ".eh_frame",
+  ".note.ABI-tag",
+  ".init_array",
+  ".fini_array",
+  ".dynamic",
+  ".got",
+  ".got.plt",
+  ".data",
+  ".bss",
+  ".comment",
+  ".symtab",
+  ".strtab",
+  ".shstrtab",
+};
+
+
+/* String table (.strtab) flat-dump. */
+char* r_strtab = {
+  '\0', 'S', 'c', 'r', 't', '1', '.', 'o', '\0', '_', '_', 'a', 'b', 'i', '_', 't', 'a', 'g', '\0', 'c', 'r', 't', 's', 't', 'u', 'f', 'f', '.', 'c', '\0', 'd', 'e', 'r', 'e', 'g', 'i', 's', 't', 'e', 'r', '_', 't', 'm', '_', 'c', 'l', 'o', 'n', 'e', 's', '\0', '_', '_', 'd', 'o', '_', 'g', 'l', 'o', 'b', 'a', 'l', '_', 'd', 't', 'o', 'r', 's', '_', 'a', 'u', 'x', '\0', 'c', 'o', 'm', 'p', 'l', 'e', 't', 'e', 'd', '.', '0', '\0', '_', '_', 'd', 'o', '_', 'g', 'l', 'o', 'b', 'a', 'l', '_', 'd', 't', 'o', 'r', 's', '_', 'a', 'u', 'x', '_', 'f', 'i', 'n', 'i', '_', 'a', 'r', 'r', 'a', 'y', '_', 'e', 'n', 't', 'r', 'y', '\0', 'f', 'r', 'a', 'm', 'e', '_', 'd', 'u', 'm', 'm', 'y', '\0', '_', '_', 'f', 'r', 'a', 'm', 'e', '_', 'd', 'u', 'm', 'm', 'y', '_', 'i', 'n', 'i', 't', '_', 'a', 'r', 'r', 'a', 'y', '_', 'e', 'n', 't', 'r', 'y', '\0', 'h', 'e', 'l', 'l', 'o', '_', 'w', 'o', 'r', 'l', 'd', '.', 'c', '\0', '_', '_', 'F', 'R', 'A', 'M', 'E', '_', 'E', 'N', 'D', '_', '_', '\0', '_', 'D', 'Y', 'N', 'A', 'M', 'I', 'C', '\0', '_', '_', 'G', 'N', 'U', '_', 'E', 'H', '_', 'F', 'R', 'A', 'M', 'E', '_', 'H', 'D', 'R', '\0', '_', 'G', 'L', 'O', 'B', 'A', 'L', '_', 'O', 'F', 'F', 'S', 'E', 'T', '_', 'T', 'A', 'B', 'L', 'E', '_', '\0', '_', '_', 'l', 'i', 'b', 'c', '_', 's', 't', 'a', 'r', 't', '_', 'm', 'a', 'i', 'n', '@', 'G', 'L', 'I', 'B', 'C', '_', '2', '.', '3', '4', '\0', '_', 'I', 'T', 'M', '_', 'd', 'e', 'r', 'e', 'g', 'i', 's', 't', 'e', 'r', 'T', 'M', 'C', 'l', 'o', 'n', 'e', 'T', 'a', 'b', 'l', 'e', '\0', 'p', 'u', 't', 's', '@', 'G', 'L', 'I', 'B', 'C', '_', '2', '.', '2', '.', '5', '\0', '_', 'e', 'd', 'a', 't', 'a', '\0', '_', 'f', 'i', 'n', 'i', '\0', '_', '_', 'd', 'a', 't', 'a', '_', 's', 't', 'a', 'r', 't', '\0', '_', '_', 'g', 'm', 'o', 'n', '_', 's', 't', 'a', 'r', 't', '_', '_', '\0', '_', '_', 'd', 's', 'o', '_', 'h', 'a', 'n', 'd', 'l', 'e', '\0', '_', 'I', 'O', '_', 's', 't', 'd', 'i', 'n', '_', 'u', 's', 'e', 'd', '\0', '_', 'e', 'n', 'd', '\0', '_', '_', 'b', 's', 's', '_', 's', 't', 'a', 'r', 't', '\0', 'm', 'a', 'i', 'n', '\0', '_', '_', 'T', 'M', 'C', '_', 'E', 'N', 'D', '_', '_', '\0', '_', 'I', 'T', 'M', '_', 'r', 'e', 'g', 'i', 's', 't', 'e', 'r', 'T', 'M', 'C', 'l', 'o', 'n', 'e', 'T', 'a', 'b', 'l', 'e', '\0', '_', '_', 'c', 'x', 'a', '_', 'f', 'i', 'n', 'a', 'l', 'i', 'z', 'e', '@', 'G', 'L', 'I', 'B', 'C', '_', '2', '.', '2', '.', '5', '\0', '_', 'i', 'n', 'i', 't', '\0', 
+};
+
+/* String table (.strtab) formatted-dump. */
+char** f_strtab = {
+  "",
+  "Scrt1.o",
+  "__abi_tag",
+  "crtstuff.c",
+  "deregister_tm_clones",
+  "__do_global_dtors_aux",
+  "completed.0",
+  "__do_global_dtors_aux_fini_array_entry",
+  "frame_dummy",
+  "__frame_dummy_init_array_entry",
+  "hello_world.c",
+  "__FRAME_END__",
+  "_DYNAMIC",
+  "__GNU_EH_FRAME_HDR",
+  "_GLOBAL_OFFSET_TABLE_",
+  "__libc_start_main@GLIBC_2.34",
+  "_ITM_deregisterTMCloneTable",
+  "puts@GLIBC_2.2.5",
+  "_edata",
+  "_fini",
+  "__data_start",
+  "__gmon_start__",
+  "__dso_handle",
+  "_IO_stdin_used",
+  "_end",
+  "__bss_start",
+  "main",
+  "__TMC_END__",
+  "_ITM_registerTMCloneTable",
+  "__cxa_finalize@GLIBC_2.2.5",
+  "_init",
 };
 
 
