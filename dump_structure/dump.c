@@ -359,3 +359,34 @@ int dump_relocations(ElfFile* AccessELF){
   fclose(f_obj);
   return 0;
 }
+
+int dump_dynstr(ElfFile* AccessELF){
+  FILE* f_obj = fopen("./output/dump.c", "a");
+  if (!f_obj){
+    fprintf(stderr, "Error: `f_obj` failed.\n  Inside `dump_dynstr`\n");
+    return -1;
+  }
+
+  fprintf(f_obj, "/* Dynamic String Table (.dynstr) flat-dump. */\n");
+  fprintf(f_obj, "char* r_dynstr = {\n  ");
+
+  for (int i = 0; i < AccessELF->r_dstr_count; i++){
+    if (AccessELF->r_dynstr[i] == '\0'){
+      fprintf(f_obj, "'\\0', ");
+      continue;
+    }
+    fprintf(f_obj, "'%c', ", AccessELF->r_dynstr[i]);
+  }
+  fprintf(f_obj, "\n};\n\n");
+
+  fprintf(f_obj, "/* Dynamic String Table (.dynstr) formatted-dump. */\n");
+  fprintf(f_obj, "char** f_dynstr = {\n");
+
+  for (int i = 0; i < AccessELF->f_dstr_count; i++){
+    fprintf(f_obj, "  \"%s\",\n", AccessELF->f_dynstr[i]);
+  }
+  fprintf(f_obj, "};\n\n\n");
+
+  fclose(f_obj);
+  return 0;
+}

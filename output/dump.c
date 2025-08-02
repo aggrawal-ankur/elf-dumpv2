@@ -1339,3 +1339,23 @@ Elf64_Rela rela_plt = {
 };
 
 
+/* Dynamic String Table (.dynstr) flat-dump. */
+char* r_dynstr = {
+  '\0', 'p', 'u', 't', 's', '\0', '_', '_', 'l', 'i', 'b', 'c', '_', 's', 't', 'a', 'r', 't', '_', 'm', 'a', 'i', 'n', '\0', '_', '_', 'c', 'x', 'a', '_', 'f', 'i', 'n', 'a', 'l', 'i', 'z', 'e', '\0', 'l', 'i', 'b', 'c', '.', 's', 'o', '.', '6', '\0', 'G', 'L', 'I', 'B', 'C', '_', '2', '.', '2', '.', '5', '\0', 'G', 'L', 'I', 'B', 'C', '_', '2', '.', '3', '4', '\0', '_', 'I', 'T', 'M', '_', 'd', 'e', 'r', 'e', 'g', 'i', 's', 't', 'e', 'r', 'T', 'M', 'C', 'l', 'o', 'n', 'e', 'T', 'a', 'b', 'l', 'e', '\0', '_', '_', 'g', 'm', 'o', 'n', '_', 's', 't', 'a', 'r', 't', '_', '_', '\0', '_', 'I', 'T', 'M', '_', 'r', 'e', 'g', 'i', 's', 't', 'e', 'r', 'T', 'M', 'C', 'l', 'o', 'n', 'e', 'T', 'a', 'b', 'l', 'e', '\0', 
+};
+
+/* Dynamic String Table (.dynstr) formatted-dump. */
+char** f_dynstr = {
+  "",
+  "puts",
+  "__libc_start_main",
+  "__cxa_finalize",
+  "libc.so.6",
+  "GLIBC_2.2.5",
+  "GLIBC_2.34",
+  "_ITM_deregisterTMCloneTable",
+  "__gmon_start__",
+  "_ITM_registerTMCloneTable",
+};
+
+
