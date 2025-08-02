@@ -43,6 +43,7 @@ typedef struct {
   int dyn_ent;              // └─ entry count
 } ElfFile;
 
+int verify_elf(FILE* f_obj);
 int parse_ehdr(FILE* f_obj, ElfFile* AccessFile);
 int parse_phdrs(FILE* f_obj, ElfFile* AccessFile);
 int parse_shdrs(FILE* f_obj, ElfFile* AccessFile);
