@@ -1359,3 +1359,217 @@ char** f_dynstr = {
 };
 
 
+/* Dynamic section dump. */
+Elf64_Dyn dynamic = {
+  {
+    /* d_tag */        1    /* entry type, DT_NEEDED */,
+    /* d_un  */   {
+      /* d_ptr */      39    /* address value (in decimal) */,
+      /* d_val */      39    /* integer value,  */,
+    }
+  },
+  {
+    /* d_tag */        12    /* entry type, DT_INIT */,
+    /* d_un  */   {
+      /* d_ptr */      4096    /* address value (in decimal) */,
+      /* d_val */      4096    /* integer value,  */,
+    }
+  },
+  {
+    /* d_tag */        13    /* entry type, DT_FINI */,
+    /* d_un  */   {
+      /* d_ptr */      4436    /* address value (in decimal) */,
+      /* d_val */      4436    /* integer value,  */,
+    }
+  },
+  {
+    /* d_tag */        25    /* entry type, DT_INIT_ARRAY */,
+    /* d_un  */   {
+      /* d_ptr */      15824    /* address value (in decimal) */,
+      /* d_val */      15824    /* integer value,  */,
+    }
+  },
+  {
+    /* d_tag */        27    /* entry type, DT_INIT_ARRAYSZ */,
+    /* d_un  */   {
+      /* d_ptr */      8    /* address value (in decimal) */,
+      /* d_val */      8    /* integer value,  */,
+    }
+  },
+  {
+    /* d_tag */        26    /* entry type, DT_FINI_ARRAY */,
+    /* d_un  */   {
+      /* d_ptr */      15832    /* address value (in decimal) */,
+      /* d_val */      15832    /* integer value,  */,
+    }
+  },
+  {
+    /* d_tag */        28    /* entry type, DT_FINI_ARRAYSZ */,
+    /* d_un  */   {
+      /* d_ptr */      8    /* address value (in decimal) */,
+      /* d_val */      8    /* integer value,  */,
+    }
+  },
+  {
+    /* d_tag */        1879047925    /* entry type, DT_GNU_HASH */,
+    /* d_un  */   {
+      /* d_ptr */      944    /* address value (in decimal) */,
+      /* d_val */      944    /* integer value,  */,
+    }
+  },
+  {
+    /* d_tag */        5    /* entry type, DT_STRTAB */,
+    /* d_un  */   {
+      /* d_ptr */      1152    /* address value (in decimal) */,
+      /* d_val */      1152    /* integer value,  */,
+    }
+  },
+  {
+    /* d_tag */        6    /* entry type, DT_SYMTAB */,
+    /* d_un  */   {
+      /* d_ptr */      984    /* address value (in decimal) */,
+      /* d_val */      984    /* integer value,  */,
+    }
+  },
+  {
+    /* d_tag */        10    /* entry type, DT_STRSZ */,
+    /* d_un  */   {
+      /* d_ptr */      141    /* address value (in decimal) */,
+      /* d_val */      141    /* integer value,  */,
+    }
+  },
+  {
+    /* d_tag */        11    /* entry type, DT_SYMENT */,
+    /* d_un  */   {
+      /* d_ptr */      24    /* address value (in decimal) */,
+      /* d_val */      24    /* integer value,  */,
+    }
+  },
+  {
+    /* d_tag */        21    /* entry type, DT_DEBUG */,
+    /* d_un  */   {
+      /* d_ptr */      0    /* address value (in decimal) */,
+      /* d_val */      0    /* integer value,  */,
+    }
+  },
+  {
+    /* d_tag */        3    /* entry type, DT_PLTGOT */,
+    /* d_un  */   {
+      /* d_ptr */      16360    /* address value (in decimal) */,
+      /* d_val */      16360    /* integer value,  */,
+    }
+  },
+  {
+    /* d_tag */        2    /* entry type, DT_PLTRELSZ */,
+    /* d_un  */   {
+      /* d_ptr */      24    /* address value (in decimal) */,
+      /* d_val */      24    /* integer value,  */,
+    }
+  },
+  {
+    /* d_tag */        20    /* entry type, DT_PLTREL */,
+    /* d_un  */   {
+      /* d_ptr */      7    /* address value (in decimal) */,
+      /* d_val */      7    /* integer value,  */,
+    }
+  },
+  {
+    /* d_tag */        23    /* entry type, DT_JMPREL */,
+    /* d_un  */   {
+      /* d_ptr */      1552    /* address value (in decimal) */,
+      /* d_val */      1552    /* integer value,  */,
+    }
+  },
+  {
+    /* d_tag */        7    /* entry type, DT_RELA */,
+    /* d_un  */   {
+      /* d_ptr */      1360    /* address value (in decimal) */,
+      /* d_val */      1360    /* integer value,  */,
+    }
+  },
+  {
+    /* d_tag */        8    /* entry type, DT_RELASZ */,
+    /* d_un  */   {
+      /* d_ptr */      192    /* address value (in decimal) */,
+      /* d_val */      192    /* integer value,  */,
+    }
+  },
+  {
+    /* d_tag */        9    /* entry type, DT_RELAENT */,
+    /* d_un  */   {
+      /* d_ptr */      24    /* address value (in decimal) */,
+      /* d_val */      24    /* integer value,  */,
+    }
+  },
+  {
+    /* d_tag */        1879048187    /* entry type, DT_FLAGS_1 */,
+    /* d_un  */   {
+      /* d_ptr */      134217728    /* address value (in decimal) */,
+      /* d_val */      134217728    /* integer value,  */,
+    }
+  },
+  {
+    /* d_tag */        1879048190    /* entry type, DT_VERNEED */,
+    /* d_un  */   {
+      /* d_ptr */      1312    /* address value (in decimal) */,
+      /* d_val */      1312    /* integer value,  */,
+    }
+  },
+  {
+    /* d_tag */        1879048191    /* entry type, DT_VERNEEDNUM */,
+    /* d_un  */   {
+      /* d_ptr */      1    /* address value (in decimal) */,
+      /* d_val */      1    /* integer value,  */,
+    }
+  },
+  {
+    /* d_tag */        1879048176    /* entry type, DT_VERSYM */,
+    /* d_un  */   {
+      /* d_ptr */      1294    /* address value (in decimal) */,
+      /* d_val */      1294    /* integer value,  */,
+    }
+  },
+  {
+    /* d_tag */        1879048185    /* entry type, DT_RELACOUNT */,
+    /* d_un  */   {
+      /* d_ptr */      3    /* address value (in decimal) */,
+      /* d_val */      3    /* integer value,  */,
+    }
+  },
+  {
+    /* d_tag */        0    /* entry type, DT_NULL */,
+    /* d_un  */   {
+      /* d_ptr */      0    /* address value (in decimal) */,
+      /* d_val */      0    /* integer value,  */,
+    }
+  },
+  {
+    /* d_tag */        0    /* entry type, DT_NULL */,
+    /* d_un  */   {
+      /* d_ptr */      0    /* address value (in decimal) */,
+      /* d_val */      0    /* integer value,  */,
+    }
+  },
+  {
+    /* d_tag */        0    /* entry type, DT_NULL */,
+    /* d_un  */   {
+      /* d_ptr */      0    /* address value (in decimal) */,
+      /* d_val */      0    /* integer value,  */,
+    }
+  },
+  {
+    /* d_tag */        0    /* entry type, DT_NULL */,
+    /* d_un  */   {
+      /* d_ptr */      0    /* address value (in decimal) */,
+      /* d_val */      0    /* integer value,  */,
+    }
+  },
+  {
+    /* d_tag */        0    /* entry type, DT_NULL */,
+    /* d_un  */   {
+      /* d_ptr */      0    /* address value (in decimal) */,
+      /* d_val */      0    /* integer value,  */,
+    }
+  },
+};
+

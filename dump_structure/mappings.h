@@ -18,5 +18,6 @@ extern struct Mapp d_sttypes[];
 extern struct Mapp d_stbinds[];
 extern struct Mapp d_stvisible[];
 extern struct Mapp rtypes[];
+extern struct Mapp d_dtypes[];
 
 #endif
