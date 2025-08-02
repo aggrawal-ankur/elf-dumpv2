@@ -543,6 +543,47 @@ Elf64_Shdr shdrs = {
     /* sh_addralign    */     1,
     /* sh_entsize      */     0         /* in bytes (decimal) */,
   },
-  }
+};
+
+
+/* Section header string table (.shstrtab) flat-dump. */
+char* shstrtab = {
+  '\0', '.', 's', 'y', 'm', 't', 'a', 'b', '\0', '.', 's', 't', 'r', 't', 'a', 'b', '\0', '.', 's', 'h', 's', 't', 'r', 't', 'a', 'b', '\0', '.', 'n', 'o', 't', 'e', '.', 'g', 'n', 'u', '.', 'p', 'r', 'o', 'p', 'e', 'r', 't', 'y', '\0', '.', 'n', 'o', 't', 'e', '.', 'g', 'n', 'u', '.', 'b', 'u', 'i', 'l', 'd', '-', 'i', 'd', '\0', '.', 'i', 'n', 't', 'e', 'r', 'p', '\0', '.', 'g', 'n', 'u', '.', 'h', 'a', 's', 'h', '\0', '.', 'd', 'y', 'n', 's', 'y', 'm', '\0', '.', 'd', 'y', 'n', 's', 't', 'r', '\0', '.', 'g', 'n', 'u', '.', 'v', 'e', 'r', 's', 'i', 'o', 'n', '\0', '.', 'g', 'n', 'u', '.', 'v', 'e', 'r', 's', 'i', 'o', 'n', '_', 'r', '\0', '.', 'r', 'e', 'l', 'a', '.', 'd', 'y', 'n', '\0', '.', 'r', 'e', 'l', 'a', '.', 'p', 'l', 't', '\0', '.', 'i', 'n', 'i', 't', '\0', '.', 'p', 'l', 't', '.', 'g', 'o', 't', '\0', '.', 't', 'e', 'x', 't', '\0', '.', 'f', 'i', 'n', 'i', '\0', '.', 'r', 'o', 'd', 'a', 't', 'a', '\0', '.', 'e', 'h', '_', 'f', 'r', 'a', 'm', 'e', '_', 'h', 'd', 'r', '\0', '.', 'e', 'h', '_', 'f', 'r', 'a', 'm', 'e', '\0', '.', 'n', 'o', 't', 'e', '.', 'A', 'B', 'I', '-', 't', 'a', 'g', '\0', '.', 'i', 'n', 'i', 't', '_', 'a', 'r', 'r', 'a', 'y', '\0', '.', 'f', 'i', 'n', 'i', '_', 'a', 'r', 'r', 'a', 'y', '\0', '.', 'd', 'y', 'n', 'a', 'm', 'i', 'c', '\0', '.', 'g', 'o', 't', '.', 'p', 'l', 't', '\0', '.', 'd', 'a', 't', 'a', '\0', '.', 'b', 's', 's', '\0', '.', 'c', 'o', 'm', 'm', 'e', 'n', 't', '\0', 
+};
+
+/* Section header string table (.shstrtab) formatted-dump. */
+char** shstrtab = {
+  {""},
+  {".note.gnu.property"},
+  {".note.gnu.build-id"},
+  {".interp"},
+  {".gnu.hash"},
+  {".dynsym"},
+  {".dynstr"},
+  {".gnu.version"},
+  {".gnu.version_r"},
+  {".rela.dyn"},
+  {".rela.plt"},
+  {".init"},
+  {".plt"},
+  {".plt.got"},
+  {".text"},
+  {".fini"},
+  {".rodata"},
+  {".eh_frame_hdr"},
+  {".eh_frame"},
+  {".note.ABI-tag"},
+  {".init_array"},
+  {".fini_array"},
+  {".dynamic"},
+  {".got"},
+  {".got.plt"},
+  {".data"},
+  {".bss"},
+  {".comment"},
+  {".symtab"},
+  {".strtab"},
+  {".shstrtab"},
+};
 
 
