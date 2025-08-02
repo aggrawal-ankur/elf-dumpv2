@@ -401,6 +401,7 @@ int dump_dynamic(ElfFile* AccessELF){
   fprintf(f_obj, "/* Dynamic section dump. */\n");
   fprintf(f_obj, "Elf64_Dyn dynamic = {\n");
 
+  printf("%d\n", AccessELF->dyn_ent);
   for (int i = 0; i < AccessELF->dyn_ent; i++){
     fprintf(f_obj, "  {\n");
     for (int k = 0; k < 47; k++){
@@ -409,7 +410,6 @@ int dump_dynamic(ElfFile* AccessELF){
         break;
       }
     }
-    // fprintf(f_obj, "    /* d_tag */        %" PRIi64 "    /* entry type,  */,\n", AccessELF->dynamic[i].d_tag);
     fprintf(f_obj, "    /* d_un  */   {\n");
     fprintf(f_obj, "      /* d_ptr */      %" PRIu64 "    /* address value (in decimal) */,\n", AccessELF->dynamic[i].d_un.d_ptr);
     fprintf(f_obj, "      /* d_val */      %" PRIu64 "    /* integer value,  */,\n", AccessELF->dynamic[i].d_un.d_val);

@@ -1,9 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "core_api/verify_elf.h"
 #include "core_api/elf_parser.h"
-#include "./dump_structure/ehdr.h"
+#include "./dump_structure/dump.h"
 
 int main(int argc, char *argv[]){
   if (argc != 2){
@@ -97,23 +96,91 @@ int main(int argc, char *argv[]){
   printf("  Dynamic string table parsed successfully.\n");
 
   printf("Parsing dynamic section....\n");
-  if (parse_dynstr(f_obj, AccessELF) != 0){
+  if (parse_dynamic(f_obj, AccessELF) != 0){
     fprintf(stderr, "  └─ Error: .dynamic entries can not be parsed.\n");
     return -1;
   }
   printf("  Dynamic section parsed successfully.\n");
 
   fclose(f_obj);
-  // return 0;
 
   // PHASE 1 COMPLETED ON 31 JULY 2025.
   // core_api WRITTEN.
 
   printf("Calling ehdr interpreter....\n");
+  general_dump();
   if (dump_ehdr(AccessELF) != 0){
+    fprintf(stderr, "  Error: `raw_ehdr` failed.\n");
+    return -1;
+  }
+  printf("  ehdr dump ready!\n");
+
+  printf("Calling phdrs interpreter....\n");
+  if (dump_phdrs(AccessELF) != 0){
     fprintf(stderr, "  Error: `dump_ehdr` failed.\n");
     return -1;
   }
-  printf("ehdr dump ready!\n");
+  printf("  phdrs dump ready!\n");
+
+  printf("Calling shdrs interpreter....\n");
+  if (dump_shdrs(AccessELF) != 0){
+    fprintf(stderr, "  Error: `dump_shdrs` failed.\n");
+    return -1;
+  }
+  printf("  shdrs dump ready!\n");
+
+  printf("Calling shstrtab interpreter....\n");
+  if (dump_shstrtab(AccessELF) != 0){
+    fprintf(stderr, "  Error: `dump_shstrtab` failed.\n");
+    return -1;
+  }
+  printf("  shstrtab dump ready!\n");
+
+  printf("Calling strtab interpreter....\n");
+  if (dump_strtab(AccessELF) != 0){
+    fprintf(stderr, "  Error: `dump_strtab` failed.\n");
+    return -1;
+  }
+  printf("  strtab dump ready!\n");
+
+  printf("Calling symtab interpreter....\n");
+  if (dump_symtab(AccessELF) != 0){
+    fprintf(stderr, "  Error: `dump_symtab` failed.\n");
+    return -1;
+  }
+  printf("  symtab dump ready!\n");
+
+  printf("Calling dynsym interpreter....\n");
+  if (dump_dynsym(AccessELF) != 0){
+    fprintf(stderr, "  Error: `dump_dynsym` failed.\n");
+    return -1;
+  }
+  printf("  dynsym dump ready!\n");
+
+  printf("Calling relocations interpreter....\n");
+  if (dump_relocations(AccessELF) != 0){
+    fprintf(stderr, "  Error: `dump_relocations` failed.\n");
+    return -1;
+  }
+  printf("  relocations dump ready!\n");
+
+  printf("Calling dynstr interpreter....\n");
+  if (dump_dynstr(AccessELF) != 0){
+    fprintf(stderr, "  Error: `dump_dynstr` failed.\n");
+    return -1;
+  }
+  printf("  dynstr dump ready!\n");
+
+  printf("Calling dynamic section interpreter....\n");
+  if (dump_dynamic(AccessELF) != 0){
+    fprintf(stderr, "  Error: `dump_dynamic` failed.\n");
+    return -1;
+  }
+  printf("  dynamic section dump ready!\n");
+
+  // PHASE-2 COMPLETED ON AUGUST 2, 2025 (23:22)
+  // PROJECT COMPLETED.
+  // LOOKING FORWARD FOR TOUCHUPS && IMPROVEMENTS
+
   return 0;
 }
