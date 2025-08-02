@@ -257,7 +257,6 @@ int dump_symtab(ElfFile* AccessFile){
   return 0;
 }
 
-
 int dump_dynsym(ElfFile* AccessFile){
   FILE* f_obj = fopen("./output/dump.c", "a");
   if (!f_obj){
@@ -300,6 +299,59 @@ int dump_dynsym(ElfFile* AccessFile){
     fprintf(f_obj, "    /* st_size      */     %" PRIu64 ",     /* symbol size (in decimal) */\n", AccessFile->dynsym[i].st_size);
     fprintf(f_obj, "  },\n");
   }
+  fprintf(f_obj, "};\n\n\n");
+
+  fclose(f_obj);
+  return 0;
+}
+
+int dump_relocations(ElfFile* AccessELF){
+  FILE* f_obj = fopen("./output/dump.c", "a");
+  if (!f_obj){
+    fprintf(stderr, "Error: `f_obj` failed.\n  Inside `dump_relocations`\n");
+    return -1;
+  }
+
+  fprintf(f_obj, "/* Eager Binding Relocations Table (.rela.dyn) dump. */\n");
+  fprintf(f_obj, "Elf64_Rela rela_dyn = {\n");
+  for (int i = 0; i < AccessELF->reladyn_count; i++){
+    fprintf(f_obj, "  {\n");
+    fprintf(f_obj, "    /* r_offset       */     %" PRIu64 "       /* offset (in decimal) in the binary */,\n\n", AccessELF->reladyn[i].r_offset);
+    fprintf(f_obj, "    /* r_info         */ {               /* %" PRIx64 ",\n", AccessELF->reladyn[i].r_info);
+
+    for (int j = 0; j < 40; j++){
+      if ((AccessELF->reladyn[i].r_info & 0xffffffff) == rtypes[j].value){
+        fprintf(f_obj, "      /* rel_type     */     %" PRIu64 "           /* %s */,\n", AccessELF->reladyn[i].r_info & 0xffffffff, rtypes[j].macro);
+        break;
+      }
+    }
+    fprintf(f_obj, "      /* sym_idx      */     %" PRIu64 ",\n", AccessELF->reladyn[i].r_info  >> 32);
+    fprintf(f_obj, "    },\n\n");
+    fprintf(f_obj, "    /* r_addend       */     %" PRIi64 ",\n", AccessELF->reladyn[i].r_addend);
+    fprintf(f_obj, "  },\n");
+  }
+
+  fprintf(f_obj, "};\n\n");
+
+  fprintf(f_obj, "/* Lazy Binding Relocations Table (.rela.plt) dump. */\n");
+  fprintf(f_obj, "Elf64_Rela rela_plt = {\n");
+  for (int i = 0; i < AccessELF->relaplt_count; i++){
+    fprintf(f_obj, "  {\n");
+    fprintf(f_obj, "    /* r_offset       */     %" PRIu64 "       /* offset (in decimal) in the binary */,\n\n", AccessELF->reladyn[i].r_offset);
+    fprintf(f_obj, "    /* r_info         */ {               /* %" PRIx64 ",\n", AccessELF->relaplt[i].r_info);
+
+    for (int j = 0; j < 40; j++){
+      if ((AccessELF->relaplt[i].r_info & 0xffffffff) == rtypes[j].value){
+        fprintf(f_obj, "      /* rel_type     */     %" PRIu64 "           /* %s */,\n", AccessELF->relaplt[i].r_info & 0xffffffff, rtypes[j].macro);
+        break;
+      }
+    }
+    fprintf(f_obj, "      /* sym_idx      */     %" PRIu64 ",\n", AccessELF->relaplt[i].r_info  >> 32);
+    fprintf(f_obj, "    },\n\n");
+    fprintf(f_obj, "    /* r_addend       */     %" PRIi64 ",\n", AccessELF->relaplt[i].r_addend);
+    fprintf(f_obj, "  },\n");
+  }
+
   fprintf(f_obj, "};\n\n\n");
 
   fclose(f_obj);

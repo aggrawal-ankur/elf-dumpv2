@@ -1197,3 +1197,102 @@ Elf64_Sym dynsym = {
 };
 
 
+/* Eager Binding Relocations Table (.rela.dyn) dump. */
+Elf64_Rela rela_dyn = {
+  {
+    /* r_offset       */     15824       /* offset (in decimal) in the binary */,
+
+    /* r_info         */ {               /* 8,
+      /* rel_type     */     8           /* R_X86_64_RELATIVE */,
+      /* sym_idx      */     0,
+    },
+
+    /* r_addend       */     4400,
+  },
+  {
+    /* r_offset       */     15832       /* offset (in decimal) in the binary */,
+
+    /* r_info         */ {               /* 8,
+      /* rel_type     */     8           /* R_X86_64_RELATIVE */,
+      /* sym_idx      */     0,
+    },
+
+    /* r_addend       */     4336,
+  },
+  {
+    /* r_offset       */     16400       /* offset (in decimal) in the binary */,
+
+    /* r_info         */ {               /* 8,
+      /* rel_type     */     8           /* R_X86_64_RELATIVE */,
+      /* sym_idx      */     0,
+    },
+
+    /* r_addend       */     16400,
+  },
+  {
+    /* r_offset       */     16320       /* offset (in decimal) in the binary */,
+
+    /* r_info         */ {               /* 100000006,
+      /* rel_type     */     6           /* R_X86_64_GLOB_DAT */,
+      /* sym_idx      */     1,
+    },
+
+    /* r_addend       */     0,
+  },
+  {
+    /* r_offset       */     16328       /* offset (in decimal) in the binary */,
+
+    /* r_info         */ {               /* 200000006,
+      /* rel_type     */     6           /* R_X86_64_GLOB_DAT */,
+      /* sym_idx      */     2,
+    },
+
+    /* r_addend       */     0,
+  },
+  {
+    /* r_offset       */     16336       /* offset (in decimal) in the binary */,
+
+    /* r_info         */ {               /* 400000006,
+      /* rel_type     */     6           /* R_X86_64_GLOB_DAT */,
+      /* sym_idx      */     4,
+    },
+
+    /* r_addend       */     0,
+  },
+  {
+    /* r_offset       */     16344       /* offset (in decimal) in the binary */,
+
+    /* r_info         */ {               /* 500000006,
+      /* rel_type     */     6           /* R_X86_64_GLOB_DAT */,
+      /* sym_idx      */     5,
+    },
+
+    /* r_addend       */     0,
+  },
+  {
+    /* r_offset       */     16352       /* offset (in decimal) in the binary */,
+
+    /* r_info         */ {               /* 600000006,
+      /* rel_type     */     6           /* R_X86_64_GLOB_DAT */,
+      /* sym_idx      */     6,
+    },
+
+    /* r_addend       */     0,
+  },
+};
+
+/* Lazy Binding Relocations Table (.rela.plt) dump. */
+Elf64_Rela rela_plt = {
+  {
+    /* r_offset       */     15824       /* offset (in decimal) in the binary */,
+
+    /* r_info         */ {               /* 300000007,
+      /* rel_type     */     7           /* R_X86_64_JUMP_SLOT */,
+      /* sym_idx      */     3,
+    },
+
+    /* r_addend       */     0,
+  },
+};
+
+

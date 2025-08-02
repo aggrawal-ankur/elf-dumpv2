@@ -17,5 +17,6 @@ extern struct Mapp d_shflags[];
 extern struct Mapp d_sttypes[];
 extern struct Mapp d_stbinds[];
 extern struct Mapp d_stvisible[];
+extern struct Mapp rtypes[];
 
 #endif

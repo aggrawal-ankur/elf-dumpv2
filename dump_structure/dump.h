@@ -11,5 +11,6 @@ int dump_shstrtab(ElfFile* AccessELF);
 int dump_strtab(ElfFile* AccessELF);
 int dump_symtab(ElfFile* AccessFile);
 int dump_dynsym(ElfFile* AccessFile);
+int dump_relocations(ElfFile* AccessELF);
 
 #endif
