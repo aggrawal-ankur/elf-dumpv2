@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "core_api/elf_parser.h"
+#include "core_api/parser.h"
 #include "./dump_structure/dump.h"
 
 int main(int argc, char *argv[]){

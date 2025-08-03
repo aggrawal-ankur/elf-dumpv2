@@ -1,7 +1,7 @@
 #ifndef DUMP_ELF
 #define DUMP_ELF
 
-#include "../core_api/elf_parser.h"
+#include "../core_api/parser.h"
 
 int general_dump();
 int dump_ehdr(ElfFile* AccessFile);

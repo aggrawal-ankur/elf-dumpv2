@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <elf.h>
-#include "elf_parser.h"
+#include "parser.h"
 
 int verify_elf(FILE* f_obj){
   unsigned char magic_bytes[4];
@@ -479,7 +479,7 @@ int parse_dynstr(FILE* f_obj, ElfFile* AccessELF){
   }
 
   AccessELF->r_dynstr = malloc(size);
-  if (!&AccessELF->r_dynstr){
+  if (!AccessELF->r_dynstr){
     fprintf(stderr, "  └─ Error: malloc failed for `r_dynstr`\n     API: `parse_dynstr`\n");
     return -1;
   }
@@ -516,7 +516,7 @@ int parse_dynstr(FILE* f_obj, ElfFile* AccessELF){
 
   /* Formatted .dynstr */
   AccessELF->f_dynstr = malloc(nEnt * sizeof(char*));
-  if (!&AccessELF->f_dynstr){
+  if (!AccessELF->f_dynstr){
     fprintf(stderr, "  └─ Error: `malloc` failed for `f_dynstr`.\n     API: `parse_dynstr`\n");
     return -1;
   }
@@ -526,7 +526,7 @@ int parse_dynstr(FILE* f_obj, ElfFile* AccessELF){
     AccessELF->f_dynstr[i] = malloc(entSizes[i] + 1);
 
     int j = 0;
-    for (j; *temp != '\0' ;j++){
+    for (; *temp != '\0' ;j++){
       AccessELF->f_dynstr[i][j] = *temp;
       temp++ ;
     }

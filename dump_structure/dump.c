@@ -401,7 +401,6 @@ int dump_dynamic(ElfFile* AccessELF){
   fprintf(f_obj, "/* Dynamic section dump. */\n");
   fprintf(f_obj, "Elf64_Dyn dynamic = {\n");
 
-  printf("%d\n", AccessELF->dyn_ent);
   for (int i = 0; i < AccessELF->dyn_ent; i++){
     fprintf(f_obj, "  {\n");
     for (int k = 0; k < 47; k++){
