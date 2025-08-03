@@ -590,3 +590,46 @@ int parse_dynamic(FILE* f_obj, ElfFile* AccessELF){
 
   return 0;
 }
+
+int deallocator(ElfFile* AccessELF){
+  if (!AccessELF){
+    return 0;
+  }
+
+  printf("Cleanup begins....\n");
+  free(AccessELF->ehdr);
+  free(AccessELF->phdrs);
+  free(AccessELF->shdrs);
+
+  free(AccessELF->r_shstrtab);
+  free(AccessELF->r_strtab);
+  free(AccessELF->r_dynstr);
+
+  free(AccessELF->symtab);
+  free(AccessELF->dynsym);
+  
+  free(AccessELF->reladyn);
+  free(AccessELF->relaplt);
+
+  free(AccessELF->dynamic);
+
+  for (int i = 0; i < AccessELF->f_shstr_count; i++){
+    free(AccessELF->f_shstrtab[i]);
+  }
+  free(AccessELF->f_shstrtab);
+
+  for (int i = 0; i < AccessELF->f_dstr_count; i++){
+    free(AccessELF->f_dynstr[i]);
+  }
+  free(AccessELF->f_dynstr);
+
+  for (int i = 0; i < AccessELF->f_str_count; i++){
+    free(AccessELF->f_strtab[i]);
+  }
+  free(AccessELF->f_strtab);
+
+  free(AccessELF);
+  printf("Cleanup ends!\n");
+
+  return 0;
+}

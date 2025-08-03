@@ -182,5 +182,8 @@ int main(int argc, char *argv[]){
   // PROJECT COMPLETED.
   // LOOKING FORWARD FOR TOUCHUPS && IMPROVEMENTS
 
+  printf("Calling deallocator.....\n");
+  deallocator(AccessELF);
+
   return 0;
 }

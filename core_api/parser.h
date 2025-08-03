@@ -54,5 +54,6 @@ int parse_dynsym(FILE* f_obj, ElfFile* AccessELF);
 int parse_relocations(FILE* f_obj, ElfFile* AccessELF);
 int parse_dynstr(FILE* f_obj, ElfFile* AccessELF);
 int parse_dynamic(FILE* f_obj, ElfFile* AccessELF);
+int deallocator(ElfFile* AccessELF);
 
 #endif
