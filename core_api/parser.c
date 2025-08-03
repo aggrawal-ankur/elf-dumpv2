@@ -259,6 +259,8 @@ int parse_strtab(FILE* f_obj, ElfFile* AccessELF){
     temp++;
   }
 
+  free(strtab_entsizes);
+
   /* Export lengths */
   AccessELF->f_str_count = strtab_ecount;
   AccessELF->r_str_count = size;
@@ -534,6 +536,8 @@ int parse_dynstr(FILE* f_obj, ElfFile* AccessELF){
 
     temp++ ;
   }
+
+  free(entSizes);
 
   AccessELF->r_dstr_count = size;
   AccessELF->f_dstr_count = nEnt;
