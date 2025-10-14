@@ -32,6 +32,10 @@ int main(int argc, char *argv[]){
   }
   memset(AccessELF, 0, sizeof(ElfFile));           // To make ptrs null and variables 0 in one hit.
 
+  AccessELF->filename = argv[1];
+  // printf("\n\n%s\n\n", argv[1]);
+  printf("\n\n%s\n\n", AccessELF->filename);
+
   printf("Parsing file headers....\n");
   if (parse_ehdr(f_obj, AccessELF) != 0){
     fprintf(stderr, "  Error: file headers can't be parsed!\n");
@@ -104,11 +108,10 @@ int main(int argc, char *argv[]){
 
   fclose(f_obj);
 
-  // PHASE 1 COMPLETED ON 31 JULY 2025.
-  // core_api WRITTEN.
+  // ----------------------------- //
 
   printf("Calling ehdr interpreter....\n");
-  general_dump();
+  general_dump(AccessELF);
   if (dump_ehdr(AccessELF) != 0){
     fprintf(stderr, "  Error: `raw_ehdr` failed.\n");
     return -1;
@@ -177,10 +180,6 @@ int main(int argc, char *argv[]){
     return -1;
   }
   printf("  dynamic section dump ready!\n");
-
-  // PHASE-2 COMPLETED ON AUGUST 2, 2025 (23:22)
-  // PROJECT COMPLETED.
-  // LOOKING FORWARD FOR TOUCHUPS && IMPROVEMENTS
 
   printf("Calling deallocator.....\n");
   deallocator(AccessELF);

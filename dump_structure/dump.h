@@ -3,7 +3,7 @@
 
 #include "../core_api/parser.h"
 
-int general_dump();
+int general_dump(ElfFile* AccessFile);
 int dump_ehdr(ElfFile* AccessFile);
 int dump_phdrs(ElfFile* AccessFile);
 int dump_shdrs(ElfFile* AccessFile);

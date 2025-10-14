@@ -3,14 +3,14 @@
 #include "dump.h"
 #include "mappings.h"
 
-int general_dump(){
+int general_dump(ElfFile* AccessFile){
   FILE* f_obj = fopen("./output/dump.c", "w");
   if (!f_obj){
     fprintf(stderr, "Error: `f_obj` failed.\n  Inside `general_dump`\n");
     return -1;
   }
 
-  fprintf(f_obj, "/* This is the raw C-style dump! */\n\n");
+  fprintf(f_obj, "/* Raw C-style dump of %s! */\n\n", AccessFile->filename);
 
   fprintf(f_obj, "/* Header file to obtain ELF type definitions. */\n");
   fprintf(f_obj, "#include <elf.h>\n\n");
