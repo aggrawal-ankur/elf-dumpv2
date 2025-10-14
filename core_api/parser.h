@@ -5,6 +5,8 @@
 #include <elf.h>
 
 typedef struct {
+  char* filename;
+
   Elf64_Ehdr* ehdr;         // File Header
   Elf64_Phdr* phdrs;        // Program Headers
   Elf64_Shdr* shdrs;        // Section Headers

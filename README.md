@@ -30,4 +30,5 @@ Add `-masm=intel` for intel assembly
 6. Selective parsing and dumping based on flags.
 7. Writing output to terminal as well.
 8. Error management.
-9. 
+
+As I am cloning it to make it more advanced, I am archiving this repository as it includes a very basic implementation which can be used for educational purposes.
