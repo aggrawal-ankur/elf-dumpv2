@@ -22,102 +22,102 @@ int verify_elf(FILE* f_obj){
   return 0;
 }
 
-int parse_ehdr(FILE* f_obj, ElfFile* AccessELF){
-  AccessELF->ehdr = malloc(sizeof(Elf64_Ehdr));
-  if (!AccessELF->ehdr){
+int parse_ehdr(FILE* f_obj, ElfFile* AccessFile){
+  AccessFile->ehdr = malloc(sizeof(Elf64_Ehdr));
+  if (!AccessFile->ehdr){
     fprintf(stderr, "Error: `malloc` failed to allocated memory for ehdr.\n");
     return -1;
   }
 
   // `verify_elf` has moved the file_ptr 4 bytes, so rewinding it.
   fseek(f_obj, 0, SEEK_SET);          // rewind(f_obj);
-  if (fread(AccessELF->ehdr, 1, sizeof(Elf64_Ehdr), f_obj) != sizeof(Elf64_Ehdr)) {
+  if (fread(AccessFile->ehdr, 1, sizeof(Elf64_Ehdr), f_obj) != sizeof(Elf64_Ehdr)) {
     fprintf(stderr, "Error: Failed to parse program headers.\n  API: `parse_phdrs`.\n");
 
-    free(AccessELF->ehdr);
-    AccessELF->ehdr = NULL;
+    free(AccessFile->ehdr);
+    AccessFile->ehdr = NULL;
     return -1;
   }
 
   return 0;
 }
 
-int parse_phdrs(FILE* f_obj, ElfFile* AccessELF){
-  if (!AccessELF->ehdr){
+int parse_phdrs(FILE* f_obj, ElfFile* AccessFile){
+  if (!AccessFile->ehdr){
     fprintf(stderr, "Error: File headers are empty.\n  API: `parse_phdrs`.\n");
     return -1;
   }
 
   // Shorthand declarations
-  Elf64_Off  phoff = AccessELF->ehdr->e_phoff;
-  Elf64_Half phentsize = AccessELF->ehdr->e_phentsize;
-  Elf64_Half phnum = AccessELF->ehdr->e_phnum;
+  Elf64_Off  phoff = AccessFile->ehdr->e_phoff;
+  Elf64_Half phentsize = AccessFile->ehdr->e_phentsize;
+  Elf64_Half phnum = AccessFile->ehdr->e_phnum;
 
-  AccessELF->phdrs = malloc(phnum * sizeof(Elf64_Phdr));
-  if (!AccessELF->phdrs){
+  AccessFile->phdrs = malloc(phnum * sizeof(Elf64_Phdr));
+  if (!AccessFile->phdrs){
     fprintf(stderr, "Error: `malloc` failed for `phdrs`.\n  API: `parse_phdrs`\n");
     return -1;
   }
 
   fseek(f_obj, phoff, SEEK_SET);
-  if (fread(AccessELF->phdrs, phentsize, phnum, f_obj) != phnum){
+  if (fread(AccessFile->phdrs, phentsize, phnum, f_obj) != phnum){
     fprintf(stderr, "Error: `fread` failed to read program headers.\n");
 
-    free(AccessELF->phdrs);
-    AccessELF->phdrs = NULL;
+    free(AccessFile->phdrs);
+    AccessFile->phdrs = NULL;
     return -1;
   }
 
   return 0;
 }
 
-int parse_shdrs(FILE* f_obj, ElfFile* AccessELF){
-  if (!AccessELF->ehdr){
+int parse_shdrs(FILE* f_obj, ElfFile* AccessFile){
+  if (!AccessFile->ehdr){
     fprintf(stderr, "Error: File headers are empty.\n  API: `parse_shdrs`.\n");
     return -1;
   }
 
   // Shorthand declarations
-  Elf64_Off  shoff = AccessELF->ehdr->e_shoff;
-  Elf64_Half shnum = AccessELF->ehdr->e_shnum;
-  Elf64_Half shentsize = AccessELF->ehdr->e_shentsize;
+  Elf64_Off  shoff = AccessFile->ehdr->e_shoff;
+  Elf64_Half shnum = AccessFile->ehdr->e_shnum;
+  Elf64_Half shentsize = AccessFile->ehdr->e_shentsize;
 
-  AccessELF->shdrs = malloc(shnum * sizeof(Elf64_Shdr));
-  if (!AccessELF->shdrs){
+  AccessFile->shdrs = malloc(shnum * sizeof(Elf64_Shdr));
+  if (!AccessFile->shdrs){
     fprintf(stderr, "Error: `malloc` failed for `shdrs`.\n  API: `parse_shdrs`\n");
     return -1;
   }
 
   fseek(f_obj, shoff, SEEK_SET);
-  if (fread(AccessELF->shdrs, shentsize, shnum, f_obj) != shnum){
+  if (fread(AccessFile->shdrs, shentsize, shnum, f_obj) != shnum){
     fprintf(stderr, "Error: `fread` failed to read section headers.\n");
 
-    free(AccessELF->shdrs);
-    AccessELF->shdrs = NULL;
+    free(AccessFile->shdrs);
+    AccessFile->shdrs = NULL;
     return -1;
   }
 
   return 0;
 }
 
-int parse_shstrtab(FILE* f_obj, ElfFile* AccessELF){
-  if (!AccessELF->ehdr){
+int parse_shstrtab(FILE* f_obj, ElfFile* AccessFile){
+  if (!AccessFile->ehdr){
     fprintf(stderr, "Error: ELF file headers are empty.\n  API: `parse_shstrtab`\n");
     return -1;
   }
 
-  if (!AccessELF->shdrs){
+  if (!AccessFile->shdrs){
     fprintf(stderr, "Error: Section headers are empty.\n API: `parse_shstrtab`\n");
     return -1;
   }
 
   // Shorthand declarations
-  Elf64_Half shdrs_count = AccessELF->ehdr->e_shnum;
+  Elf64_Half shdrs_count = AccessFile->ehdr->e_shnum;
 
   /* Locating section header string table entry in shdrs */
-  int idx  = AccessELF->ehdr->e_shstrndx;
-  int off  = AccessELF->shdrs[idx].sh_offset;
-  int size = AccessELF->shdrs[idx].sh_size;
+  int idx  = AccessFile->ehdr->e_shstrndx;
+  int off  = AccessFile->shdrs[idx].sh_offset;
+  int size = AccessFile->shdrs[idx].sh_size;
 
   fseek(f_obj, off, SEEK_SET);
 
@@ -125,65 +125,65 @@ int parse_shstrtab(FILE* f_obj, ElfFile* AccessELF){
 
   // A flat 1-byte array to store section header string table entries.
   // Like this: `s, e, c, t, i, o, n, \0, h, e, a, d, e, r, \0` and so on.
-  AccessELF->r_shstrtab = malloc(size);
-  if (!AccessELF->r_shstrtab){
+  AccessFile->r_shstrtab = malloc(size);
+  if (!AccessFile->r_shstrtab){
     fprintf(stderr, "Error: `malloc` failed for `r_shstrtab`.\n  API: `parse_shstrtab`\n");
     return -1;
   }
 
-  fread(AccessELF->r_shstrtab, 1, size, f_obj);
+  fread(AccessFile->r_shstrtab, 1, size, f_obj);
     // Each entry: 1-byte
     // total entries: size
 
-  if (!AccessELF->r_shstrtab){
+  if (!AccessFile->r_shstrtab){
     fprintf(stderr, "Error: Failed to parse section header string table in raw form.\n  API: `parse_shstrtab`\n");
 
-    free(AccessELF->r_shstrtab);
-    AccessELF->r_shstrtab = NULL;
+    free(AccessFile->r_shstrtab);
+    AccessFile->r_shstrtab = NULL;
     return -1;
   }
 
   /* Formatting raw shdr string table into distinct char entries */
-  AccessELF->f_shstrtab = malloc(shdrs_count * sizeof(char*));
-  if (!AccessELF->f_shstrtab){
+  AccessFile->f_shstrtab = malloc(shdrs_count * sizeof(char*));
+  if (!AccessFile->f_shstrtab){
     fprintf(stderr, "Error: `malloc` failed for `f_shstrtab`.\n API: `parse_shstrtab`\n");
     return -1;
   }
 
   for (int i = 0; i < shdrs_count; i++){
-    AccessELF->f_shstrtab[i] = strdup(&AccessELF->r_shstrtab[AccessELF->shdrs[i].sh_name]);
+    AccessFile->f_shstrtab[i] = strdup(&AccessFile->r_shstrtab[AccessFile->shdrs[i].sh_name]);
     // Note: `strdup()` will manage allocating memory to char* entries
     // CHANGE THIS
   }
 
-  AccessELF->r_shstr_count = size;
-  AccessELF->f_shstr_count = shdrs_count;
+  AccessFile->r_shstr_count = size;
+  AccessFile->f_shstr_count = shdrs_count;
 
   return 0;
 }
 
-int parse_strtab(FILE* f_obj, ElfFile* AccessELF){
-  if (!AccessELF->ehdr){
+int parse_strtab(FILE* f_obj, ElfFile* AccessFile){
+  if (!AccessFile->ehdr){
     fprintf(stderr, "Error: File headers are empty.\n  API: `parse_strtab`.\n");
     return -1;
   }
 
-  if (!AccessELF->r_shstrtab){
+  if (!AccessFile->r_shstrtab){
     fprintf(stderr, "Error: Raw section header string table is empty.\n  API: `parse_strtab`.\n");
     return -1;
   }
 
   // Shorthand declarations
-  Elf64_Half shdrs_count = AccessELF->ehdr->e_shnum;
+  Elf64_Half shdrs_count = AccessFile->ehdr->e_shnum;
 
   // Extracting metadata about string table
   int idx = -1, off = 0, size = 0;
   for (int i = 0; i < shdrs_count; i++){
-    int tmp_off = AccessELF->shdrs[i].sh_name;
-    if (AccessELF->shdrs[i].sh_type == SHT_STRTAB && (strcmp(&AccessELF->r_shstrtab[tmp_off], ".strtab") == 0)){
+    int tmp_off = AccessFile->shdrs[i].sh_name;
+    if (AccessFile->shdrs[i].sh_type == SHT_STRTAB && (strcmp(&AccessFile->r_shstrtab[tmp_off], ".strtab") == 0)){
       idx = i;
-      off = (AccessELF->shdrs)[idx].sh_offset;
-      size = (AccessELF->shdrs)[idx].sh_size;
+      off = (AccessFile->shdrs)[idx].sh_offset;
+      size = (AccessFile->shdrs)[idx].sh_size;
       break;
     }
   }
@@ -197,19 +197,19 @@ int parse_strtab(FILE* f_obj, ElfFile* AccessELF){
 
   // A flat 1-byte array to store the string table content in raw form.
   // Like this: `s, e, c, t, i, o, n, \0, h, e, a, d, e, r, \0` and so on.
-  AccessELF->r_strtab = malloc(size);
-  if (!AccessELF->r_strtab){
+  AccessFile->r_strtab = malloc(size);
+  if (!AccessFile->r_strtab){
     fprintf(stderr, "Error: `malloc` failed for `r_strtab`.\n  API: `parse_strtab`\n");
     return -1;
   }
 
   fseek(f_obj, off, SEEK_SET);
-  fread(AccessELF->r_strtab, 1, size, f_obj);
+  fread(AccessFile->r_strtab, 1, size, f_obj);
 
   // Finding total no. of distinct entries in the string table
   int strtab_ecount = 0;
   for (int i = 0; i < size; i++){
-    if (AccessELF->r_strtab[i] == '\0'){
+    if (AccessFile->r_strtab[i] == '\0'){
       strtab_ecount++;
     }
   }
@@ -224,7 +224,7 @@ int parse_strtab(FILE* f_obj, ElfFile* AccessELF){
   int e_cnt = 0;  // entry  counter variable; traversing based on number of entries
   int l_cnt = 0;  // length counter variable; traversing based on the characters in each entry
   for (int i = 0; i < size; i++){
-    if (AccessELF->r_strtab[i] != '\0'){
+    if (AccessFile->r_strtab[i] != '\0'){
       l_cnt++ ;
     }
     else{
@@ -236,25 +236,25 @@ int parse_strtab(FILE* f_obj, ElfFile* AccessELF){
 
   /* Formatting raw string table into distinct char entries */
 
-  AccessELF->f_strtab = malloc(strtab_ecount * sizeof(char*));
-  if (!AccessELF->f_strtab){
+  AccessFile->f_strtab = malloc(strtab_ecount * sizeof(char*));
+  if (!AccessFile->f_strtab){
     fprintf(stderr, "Error: `malloc` failed for `str_tab`.\n API: `parse_strtab`\n");
     return -1;
   }
 
   // i: each individual entry of type char*
   // j: individual characters in each entry of type char*
-  char* temp = AccessELF->r_strtab;
+  char* temp = AccessFile->r_strtab;
   for (int i = 0; i < strtab_ecount; i++){
     // Allocate individual char* entries inside char**
-    AccessELF->f_strtab[i] = malloc(strtab_entsizes[i] + 1);
+    AccessFile->f_strtab[i] = malloc(strtab_entsizes[i] + 1);
 
     int j = 0;
     for (; *temp != '\0'; j++){
-      AccessELF->f_strtab[i][j] = *temp;
+      AccessFile->f_strtab[i][j] = *temp;
       temp++;
     }
-    AccessELF->f_strtab[i][j] = '\0';
+    AccessFile->f_strtab[i][j] = '\0';
 
     temp++;
   }
@@ -262,34 +262,34 @@ int parse_strtab(FILE* f_obj, ElfFile* AccessELF){
   free(strtab_entsizes);
 
   /* Export lengths */
-  AccessELF->f_str_count = strtab_ecount;
-  AccessELF->r_str_count = size;
+  AccessFile->f_str_count = strtab_ecount;
+  AccessFile->r_str_count = size;
 
   return 0;
 }
 
-int parse_symtab(FILE* f_obj, ElfFile* AccessELF){
-  if (!AccessELF->ehdr){
+int parse_symtab(FILE* f_obj, ElfFile* AccessFile){
+  if (!AccessFile->ehdr){
     fprintf(stderr, "  └─ Error: File headers are empty.\n     API: `parse_symtab`.\n");
     return -1;
   }
 
-  if (!AccessELF->shdrs){
+  if (!AccessFile->shdrs){
     fprintf(stderr, "  └─ Error: Section headers are empty.\n     API: `parse_symtab`.\n");
     return -1;
   }
 
   // Shorthand declarations
-  int shdrs_count = AccessELF->ehdr->e_shnum;
+  int shdrs_count = AccessFile->ehdr->e_shnum;
 
   /* Find .symtab entry in section headers */
   int idx = -1, off = 0, size = 0, entSize = 0, nEnt = 0;
   for (int i = 0; i < shdrs_count; i++){
-    if (AccessELF->shdrs[i].sh_type == SHT_SYMTAB){
+    if (AccessFile->shdrs[i].sh_type == SHT_SYMTAB){
       idx = i;
-      off = AccessELF->shdrs[idx].sh_offset;
-      size = AccessELF->shdrs[idx].sh_size;
-      entSize = AccessELF->shdrs[idx].sh_entsize;
+      off = AccessFile->shdrs[idx].sh_offset;
+      size = AccessFile->shdrs[idx].sh_size;
+      entSize = AccessFile->shdrs[idx].sh_entsize;
     }
   }
   nEnt = size/entSize;
@@ -299,48 +299,48 @@ int parse_symtab(FILE* f_obj, ElfFile* AccessELF){
     return -1;
   }
 
-  AccessELF->symtab = malloc(size);
-  if (!AccessELF->symtab){
+  AccessFile->symtab = malloc(size);
+  if (!AccessFile->symtab){
     fprintf(stderr, "  └─ Error: `malloc` failed for `.symtab`.\n     API: `parse_symtab`\n");
     return -1;
   }
 
   fseek(f_obj, off, SEEK_SET);
-  if (fread(AccessELF->symtab, entSize, nEnt, f_obj) != nEnt){
+  if (fread(AccessFile->symtab, entSize, nEnt, f_obj) != nEnt){
     fprintf(stderr, "  └─ Error: failed to parse .symtab\n     API: `parse_symtab`\n");
 
-    free(AccessELF->symtab);
-    AccessELF->symtab = NULL;
+    free(AccessFile->symtab);
+    AccessFile->symtab = NULL;
     return -1;
   }
 
-  AccessELF->symtab_count = nEnt;
+  AccessFile->symtab_count = nEnt;
 
   return 0;
 }
 
-int parse_dynsym(FILE* f_obj, ElfFile* AccessELF){
-  if (!AccessELF->ehdr){
+int parse_dynsym(FILE* f_obj, ElfFile* AccessFile){
+  if (!AccessFile->ehdr){
     fprintf(stderr, "  └─ Error: File headers are empty.\n     API: `parse_dynsym`.\n");
     return -1;
   }
 
-  if (!AccessELF->shdrs){
+  if (!AccessFile->shdrs){
     fprintf(stderr, "  └─ Error: Section headers are empty.\n     API: `parse_dynsym`.\n");
     return -1;
   }
 
   // Shorthand declarations
-  int shdrs_count = AccessELF->ehdr->e_shnum;
+  int shdrs_count = AccessFile->ehdr->e_shnum;
 
   /* Find .dynsym entry in section headers */
   int idx = -1, off = 0, size = 0, entSize = 0, nEnt = 0;
   for (int i = 0; i < shdrs_count; i++){
-    if (AccessELF->shdrs[i].sh_type == SHT_DYNSYM){
+    if (AccessFile->shdrs[i].sh_type == SHT_DYNSYM){
       idx = i;
-      off = AccessELF->shdrs[idx].sh_offset;
-      size = AccessELF->shdrs[idx].sh_size;
-      entSize = AccessELF->shdrs[idx].sh_entsize;
+      off = AccessFile->shdrs[idx].sh_offset;
+      size = AccessFile->shdrs[idx].sh_size;
+      entSize = AccessFile->shdrs[idx].sh_entsize;
     }
   }
   nEnt = size/entSize;
@@ -350,57 +350,57 @@ int parse_dynsym(FILE* f_obj, ElfFile* AccessELF){
     return -1;
   }
 
-  AccessELF->dynsym = malloc(size);
-  if (!AccessELF->dynsym){
+  AccessFile->dynsym = malloc(size);
+  if (!AccessFile->dynsym){
     fprintf(stderr, "  └─ Error: `malloc` failed for `.dynsym`.\n    API: `parse_dynsym`\n");
     return -1;
   }
 
   fseek(f_obj, off, SEEK_SET);
-  if (fread(AccessELF->dynsym, entSize, nEnt, f_obj) != nEnt){
+  if (fread(AccessFile->dynsym, entSize, nEnt, f_obj) != nEnt){
     fprintf(stderr, "  └─ Error: failed to parse .dynsym\n     API: `parse_dynsym`\n");
 
-    free(AccessELF->dynsym);
-    AccessELF->dynsym = NULL;
+    free(AccessFile->dynsym);
+    AccessFile->dynsym = NULL;
     return -1;
   }
 
-  AccessELF->dynsym_count = nEnt;
+  AccessFile->dynsym_count = nEnt;
 
   return 0;
 }
 
-int parse_relocations(FILE* f_obj, ElfFile* AccessELF){
-  if (!AccessELF->ehdr){
+int parse_relocations(FILE* f_obj, ElfFile* AccessFile){
+  if (!AccessFile->ehdr){
     fprintf(stderr, "  └─ Error: File headers are empty.\n     API: `parse_relocations`.\n");
     return -1;
   }
 
-  if (!AccessELF->shdrs){
+  if (!AccessFile->shdrs){
     fprintf(stderr, "  └─ Error: Section headers are empty.\n     API: `parse_relocations`.\n");
     return -1;
   }
 
   // Shorthand declarations
-  int shdrs_count = AccessELF->ehdr->e_shnum;
+  int shdrs_count = AccessFile->ehdr->e_shnum;
 
   /* Finding relocation tables in shdrs */
   int dyn_idx, dyn_off, dyn_size, dyn_entSize, dyn_nEnt;
   int plt_idx, plt_off, plt_size, plt_entSize, plt_nEnt;
   for (int i = 0; i < shdrs_count; i++){
-    if ((AccessELF->shdrs[i].sh_type == SHT_RELA) && (strcmp(AccessELF->f_shstrtab[i], ".rela.dyn") == 0)){
+    if ((AccessFile->shdrs[i].sh_type == SHT_RELA) && (strcmp(AccessFile->f_shstrtab[i], ".rela.dyn") == 0)){
       // printf("here\n");
       dyn_idx = i;
-      dyn_off = AccessELF->shdrs[dyn_idx].sh_offset;
-      dyn_size = AccessELF->shdrs[dyn_idx].sh_size;
-      dyn_entSize = AccessELF->shdrs[dyn_idx].sh_entsize;
+      dyn_off = AccessFile->shdrs[dyn_idx].sh_offset;
+      dyn_size = AccessFile->shdrs[dyn_idx].sh_size;
+      dyn_entSize = AccessFile->shdrs[dyn_idx].sh_entsize;
     }
 
-    if ((AccessELF->shdrs[i].sh_type == SHT_RELA) && (strcmp(AccessELF->f_shstrtab[i], ".rela.plt") == 0)){
+    if ((AccessFile->shdrs[i].sh_type == SHT_RELA) && (strcmp(AccessFile->f_shstrtab[i], ".rela.plt") == 0)){
       plt_idx = i;
-      plt_off = AccessELF->shdrs[plt_idx].sh_offset;
-      plt_size = AccessELF->shdrs[plt_idx].sh_size;
-      plt_entSize = AccessELF->shdrs[plt_idx].sh_entsize;
+      plt_off = AccessFile->shdrs[plt_idx].sh_offset;
+      plt_size = AccessFile->shdrs[plt_idx].sh_size;
+      plt_entSize = AccessFile->shdrs[plt_idx].sh_entsize;
     }
   }
   dyn_nEnt = dyn_size/dyn_entSize;
@@ -415,63 +415,63 @@ int parse_relocations(FILE* f_obj, ElfFile* AccessELF){
     return -1;
   }
 
-  AccessELF->reladyn = malloc(dyn_size);
-  if (!AccessELF->reladyn){
+  AccessFile->reladyn = malloc(dyn_size);
+  if (!AccessFile->reladyn){
     fprintf(stderr, "  └─ Error: `malloc` failed for `rela_dyn`.\n     API: `parse_relocations`\n");
     return -1;
   }
 
   fseek(f_obj, dyn_off, SEEK_SET);
-  if (fread(AccessELF->reladyn, dyn_entSize, dyn_nEnt, f_obj) != dyn_nEnt){
+  if (fread(AccessFile->reladyn, dyn_entSize, dyn_nEnt, f_obj) != dyn_nEnt){
     fprintf(stderr, "  └─ Error: failed to parse .rela.dyn entries.\n     API: `parse_relocations`\n");
 
-    free(AccessELF->reladyn);
-    AccessELF->reladyn = NULL;
+    free(AccessFile->reladyn);
+    AccessFile->reladyn = NULL;
     return -1;
   }
 
-  AccessELF->relaplt = malloc(plt_size);
-  if (!AccessELF->relaplt){
+  AccessFile->relaplt = malloc(plt_size);
+  if (!AccessFile->relaplt){
     fprintf(stderr, "  └─ Error: `malloc` failed for `relaplt`.\n     API: `parse_relocations`\n");
     return -1;
   }
 
   fseek(f_obj, plt_off, SEEK_SET);
-  if (fread(AccessELF->relaplt, plt_entSize, plt_nEnt, f_obj) != plt_nEnt){
+  if (fread(AccessFile->relaplt, plt_entSize, plt_nEnt, f_obj) != plt_nEnt){
     fprintf(stderr, "  └─ Error: failed to parse .rela.plt entries.\n     API: `parse_relocations`\n");
 
-    free(AccessELF->relaplt);
-    AccessELF->relaplt = NULL;
+    free(AccessFile->relaplt);
+    AccessFile->relaplt = NULL;
     return -1;
   }
 
-  AccessELF->reladyn_count = dyn_nEnt;
-  AccessELF->relaplt_count = plt_nEnt;
+  AccessFile->reladyn_count = dyn_nEnt;
+  AccessFile->relaplt_count = plt_nEnt;
 
   return 0;
 }
 
-int parse_dynstr(FILE* f_obj, ElfFile* AccessELF){
-  if (!AccessELF->ehdr){
+int parse_dynstr(FILE* f_obj, ElfFile* AccessFile){
+  if (!AccessFile->ehdr){
     fprintf(stderr, "Error: File headers are empty.\n  API: `parse_dynstr`.\n");
     return -1;
   }
 
-  if (!AccessELF->r_shstrtab){
+  if (!AccessFile->r_shstrtab){
     fprintf(stderr, "Error: Raw section header string table is empty.\n  API: `parse_dynstr`.\n");
     return -1;
   }
 
   // Shorthand declarations
-  Elf64_Half shdrs_count = AccessELF->ehdr->e_shnum;
+  Elf64_Half shdrs_count = AccessFile->ehdr->e_shnum;
 
   // Extract metadata about .dynstr
   int idx = -1, off = 0, size = 0;
   for (int i = 0; i < shdrs_count; i++){
-    if (AccessELF->shdrs[i].sh_type == SHT_STRTAB && (strcmp(AccessELF->f_shstrtab[i] , ".dynstr") == 0)){
+    if (AccessFile->shdrs[i].sh_type == SHT_STRTAB && (strcmp(AccessFile->f_shstrtab[i] , ".dynstr") == 0)){
       idx  = i;
-      off  = AccessELF->shdrs[i].sh_offset;
-      size = AccessELF->shdrs[i].sh_size;
+      off  = AccessFile->shdrs[i].sh_offset;
+      size = AccessFile->shdrs[i].sh_size;
     }
   }
 
@@ -480,24 +480,24 @@ int parse_dynstr(FILE* f_obj, ElfFile* AccessELF){
     return -1;
   }
 
-  AccessELF->r_dynstr = malloc(size);
-  if (!AccessELF->r_dynstr){
+  AccessFile->r_dynstr = malloc(size);
+  if (!AccessFile->r_dynstr){
     fprintf(stderr, "  └─ Error: malloc failed for `r_dynstr`\n     API: `parse_dynstr`\n");
     return -1;
   }
 
   fseek(f_obj, off, SEEK_SET);
-  if (fread(AccessELF->r_dynstr, 1, size, f_obj) != size){
+  if (fread(AccessFile->r_dynstr, 1, size, f_obj) != size){
     fprintf(stderr, "  └─ Error: `fread` failed to parse .dynstr\n     API: `parse_dynstr`\n");
 
-    free(AccessELF->r_dynstr);
-    AccessELF->r_dynstr = NULL;
+    free(AccessFile->r_dynstr);
+    AccessFile->r_dynstr = NULL;
     return -1;
   }
 
   int nEnt = 0;
   for (int i = 0; i < size; i++){
-    if (AccessELF->r_dynstr[i] == '\0'){
+    if (AccessFile->r_dynstr[i] == '\0'){
       nEnt++ ;
     }
   }
@@ -506,7 +506,7 @@ int parse_dynstr(FILE* f_obj, ElfFile* AccessELF){
   int len_cnt = 0;
   int* entSizes = malloc(size);
   for (int i = 0; i < size; i++){
-    if (AccessELF->r_dynstr[i] != '\0'){
+    if (AccessFile->r_dynstr[i] != '\0'){
       len_cnt++ ;
     }
     else{
@@ -517,56 +517,56 @@ int parse_dynstr(FILE* f_obj, ElfFile* AccessELF){
   }
 
   /* Formatted .dynstr */
-  AccessELF->f_dynstr = malloc(nEnt * sizeof(char*));
-  if (!AccessELF->f_dynstr){
+  AccessFile->f_dynstr = malloc(nEnt * sizeof(char*));
+  if (!AccessFile->f_dynstr){
     fprintf(stderr, "  └─ Error: `malloc` failed for `f_dynstr`.\n     API: `parse_dynstr`\n");
     return -1;
   }
 
-  char *temp = AccessELF->r_dynstr;
+  char *temp = AccessFile->r_dynstr;
   for (int i = 0; i < nEnt; i++){
-    AccessELF->f_dynstr[i] = malloc(entSizes[i] + 1);
+    AccessFile->f_dynstr[i] = malloc(entSizes[i] + 1);
 
     int j = 0;
     for (; *temp != '\0' ;j++){
-      AccessELF->f_dynstr[i][j] = *temp;
+      AccessFile->f_dynstr[i][j] = *temp;
       temp++ ;
     }
-    AccessELF->f_dynstr[i][j] = '\0';
+    AccessFile->f_dynstr[i][j] = '\0';
 
     temp++ ;
   }
 
   free(entSizes);
 
-  AccessELF->r_dstr_count = size;
-  AccessELF->f_dstr_count = nEnt;
+  AccessFile->r_dstr_count = size;
+  AccessFile->f_dstr_count = nEnt;
 
   return 0;
 }
 
-int parse_dynamic(FILE* f_obj, ElfFile* AccessELF){
-  if (!AccessELF->ehdr){
+int parse_dynamic(FILE* f_obj, ElfFile* AccessFile){
+  if (!AccessFile->ehdr){
     fprintf(stderr, "  └─ Error: ELF file headers are empty.\n  API: `parse_dynamic`\n");
     return -1;
   }
 
-  if (!AccessELF->shdrs){
+  if (!AccessFile->shdrs){
     fprintf(stderr, "  └─ Error: Section headers are empty.\n API: `parse_dynamic`\n");
     return -1;
   }
 
   // Shorthand declarations
-  Elf64_Half shdrs_count = AccessELF->ehdr->e_shnum;
+  Elf64_Half shdrs_count = AccessFile->ehdr->e_shnum;
 
   /* Find where it is */
   int idx = -1, off = 0, size = 0, entSize = 0;
   for (int i = 0; i < shdrs_count; i++){
-    if (AccessELF->shdrs[i].sh_type == SHT_DYNAMIC){
+    if (AccessFile->shdrs[i].sh_type == SHT_DYNAMIC){
       idx  = i;
-      off  = AccessELF->shdrs[i].sh_offset;
-      size = AccessELF->shdrs[i].sh_size;
-      entSize = AccessELF->shdrs[i].sh_entsize;
+      off  = AccessFile->shdrs[i].sh_offset;
+      size = AccessFile->shdrs[i].sh_size;
+      entSize = AccessFile->shdrs[i].sh_entsize;
     }
   }
   int nEnt = size/entSize;
@@ -576,63 +576,63 @@ int parse_dynamic(FILE* f_obj, ElfFile* AccessELF){
     return -1;
   }
 
-  AccessELF->dynamic = malloc(size);
-  if (!AccessELF->dynamic){
+  AccessFile->dynamic = malloc(size);
+  if (!AccessFile->dynamic){
     fprintf(stderr, "  └─ Erro: `malloc` failed for `dynamic`.\n     API: `parse_dynamic`\n");
     return -1;
   }
 
   fseek(f_obj, off, SEEK_SET);
-  if (fread(AccessELF->dynamic, entSize, nEnt, f_obj) != nEnt){
+  if (fread(AccessFile->dynamic, entSize, nEnt, f_obj) != nEnt){
     fprintf(stderr, "  └─ Error: `fread` failed to read .dynamic.\n     API: `parse_dynamic`\n");
 
-    free(AccessELF->dynamic);
-    AccessELF->dynamic = NULL;
+    free(AccessFile->dynamic);
+    AccessFile->dynamic = NULL;
     return -1;
   }
-  AccessELF->dyn_ent = nEnt;
+  AccessFile->dyn_ent = nEnt;
 
   return 0;
 }
 
-int deallocator(ElfFile* AccessELF){
-  if (!AccessELF){
+int deallocator(ElfFile* AccessFile){
+  if (!AccessFile){
     return 0;
   }
 
   printf("Cleanup begins....\n");
-  free(AccessELF->ehdr);
-  free(AccessELF->phdrs);
-  free(AccessELF->shdrs);
+  free(AccessFile->ehdr);
+  free(AccessFile->phdrs);
+  free(AccessFile->shdrs);
 
-  free(AccessELF->r_shstrtab);
-  free(AccessELF->r_strtab);
-  free(AccessELF->r_dynstr);
+  free(AccessFile->r_shstrtab);
+  free(AccessFile->r_strtab);
+  free(AccessFile->r_dynstr);
 
-  free(AccessELF->symtab);
-  free(AccessELF->dynsym);
+  free(AccessFile->symtab);
+  free(AccessFile->dynsym);
   
-  free(AccessELF->reladyn);
-  free(AccessELF->relaplt);
+  free(AccessFile->reladyn);
+  free(AccessFile->relaplt);
 
-  free(AccessELF->dynamic);
+  free(AccessFile->dynamic);
 
-  for (int i = 0; i < AccessELF->f_shstr_count; i++){
-    free(AccessELF->f_shstrtab[i]);
+  for (int i = 0; i < AccessFile->f_shstr_count; i++){
+    free(AccessFile->f_shstrtab[i]);
   }
-  free(AccessELF->f_shstrtab);
+  free(AccessFile->f_shstrtab);
 
-  for (int i = 0; i < AccessELF->f_dstr_count; i++){
-    free(AccessELF->f_dynstr[i]);
+  for (int i = 0; i < AccessFile->f_dstr_count; i++){
+    free(AccessFile->f_dynstr[i]);
   }
-  free(AccessELF->f_dynstr);
+  free(AccessFile->f_dynstr);
 
-  for (int i = 0; i < AccessELF->f_str_count; i++){
-    free(AccessELF->f_strtab[i]);
+  for (int i = 0; i < AccessFile->f_str_count; i++){
+    free(AccessFile->f_strtab[i]);
   }
-  free(AccessELF->f_strtab);
+  free(AccessFile->f_strtab);
 
-  free(AccessELF);
+  free(AccessFile);
   printf("Cleanup ends!\n");
 
   return 0;
