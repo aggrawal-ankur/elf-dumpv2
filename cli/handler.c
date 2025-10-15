@@ -1,6 +1,29 @@
 #include <stdio.h>
+#include <string.h>
 #include "handler.h"
 #include "../core_api/parser.h"
+
+CmdStack commands[] = {
+  {"dump", dump_handler, "Dump the ELF layout in a C-style file."},
+  {"show", show_handler, "Display the ELF layout on the terminal."},
+  {NULL, NULL, NULL}
+};
+
+TargetSpec dump_targets[] = {
+  {"all", dump_all, "Dump everything.\n"},
+  {"ehdr", dump_ehdr, "Dump ELF file header.\n"},
+  {"phdrs", dump_phdrs, "Dump program headers.\n"},
+  {"shdrs", dump_shdrs, "Dump section headers.\n"},
+  {"shstrtab", dump_shstrtab, "Dump section header string table.\n"},
+  {"symtab", dump_symtab, "Dump global symbol table.\n"},
+  {"strtab", dump_strtab, "Dump string table for global symbol table.\n"},
+  {"dynsym", dump_dynsym, "Dump dynamic symbol table.\n"},
+  {"dynstr", dump_dynstr, "Dump string table for dynamic symbol table.\n"},
+  {"dynamic", dump_dynamic, "Dump dynamic section.\n"},
+  {"relocations", dump_relocations, "Dump all relocation entries.\n"},
+  {"reladyn", dump_reladyn, "Dump .rela.dyn relocation entries.\n"},
+  {"relaplt", dump_relaplt, "Dump .rela.plt relocation entries.\n"},
+};
 
 int dump_handler(const char* target, const char* filename, ElfFile* AccessFile){
   fprintf(stdout, "Dumping %s from %s....\n", target, filename);
@@ -13,3 +36,5 @@ int dump_handler(const char* target, const char* filename, ElfFile* AccessFile){
   fprintf(stderr, "Unknown dump target: %s\n", target);
   return 1;
 }
+
+int show_handler(const char* target, const char* filename, ElfFile* AccessFile){return 0;}

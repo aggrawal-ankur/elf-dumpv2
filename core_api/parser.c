@@ -595,45 +595,45 @@ int parse_dynamic(FILE* f_obj, ElfFile* AccessFile){
   return 0;
 }
 
-int deallocator(ElfFile* AccessFile){
-  if (!AccessFile){
-    return 0;
-  }
+// int deallocator(ElfFile* AccessFile){
+//   if (!AccessFile){
+//     return 0;
+//   }
 
-  printf("Cleanup begins....\n");
-  free(AccessFile->ehdr);
-  free(AccessFile->phdrs);
-  free(AccessFile->shdrs);
+//   printf("Cleanup begins....\n");
+//   free(AccessFile->ehdr);
+//   free(AccessFile->phdrs);
+//   free(AccessFile->shdrs);
 
-  free(AccessFile->r_shstrtab);
-  free(AccessFile->r_strtab);
-  free(AccessFile->r_dynstr);
+//   free(AccessFile->r_shstrtab);
+//   free(AccessFile->r_strtab);
+//   free(AccessFile->r_dynstr);
 
-  free(AccessFile->symtab);
-  free(AccessFile->dynsym);
+//   free(AccessFile->symtab);
+//   free(AccessFile->dynsym);
   
-  free(AccessFile->reladyn);
-  free(AccessFile->relaplt);
+//   free(AccessFile->reladyn);
+//   free(AccessFile->relaplt);
 
-  free(AccessFile->dynamic);
+//   free(AccessFile->dynamic);
 
-  for (int i = 0; i < AccessFile->f_shstr_count; i++){
-    free(AccessFile->f_shstrtab[i]);
-  }
-  free(AccessFile->f_shstrtab);
+//   for (int i = 0; i < AccessFile->f_shstr_count; i++){
+//     free(AccessFile->f_shstrtab[i]);
+//   }
+//   free(AccessFile->f_shstrtab);
 
-  for (int i = 0; i < AccessFile->f_dstr_count; i++){
-    free(AccessFile->f_dynstr[i]);
-  }
-  free(AccessFile->f_dynstr);
+//   for (int i = 0; i < AccessFile->f_dstr_count; i++){
+//     free(AccessFile->f_dynstr[i]);
+//   }
+//   free(AccessFile->f_dynstr);
 
-  for (int i = 0; i < AccessFile->f_str_count; i++){
-    free(AccessFile->f_strtab[i]);
-  }
-  free(AccessFile->f_strtab);
+//   for (int i = 0; i < AccessFile->f_str_count; i++){
+//     free(AccessFile->f_strtab[i]);
+//   }
+//   free(AccessFile->f_strtab);
 
-  free(AccessFile);
-  printf("Cleanup ends!\n");
+//   free(AccessFile);
+//   printf("Cleanup ends!\n");
 
-  return 0;
-}
+//   return 0;
+// }

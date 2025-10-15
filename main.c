@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include "cli/handler.h"
 
 void usage(const char* prog){
@@ -7,7 +8,7 @@ void usage(const char* prog){
   fprintf(stderr, "Commands:\n");
   
   CmdStack* cmd = commands;
-  for (cmd; cmd->name; cmd++){
+  for (; cmd->name; cmd++){
     fprintf(stderr, "  %-8s : %s\n", cmd->name, cmd->description);
   }
 }
@@ -36,6 +37,23 @@ int main(int argc, char** argv){
 
   // To make ptrs null and variables 0 in one hit.
   memset(AccessFile, 0, sizeof(ElfFile));
+
+  // Set the filename variable
+  AccessFile->filename = argv[3];
+
+  // Populate the ELF layout (ElfFile)
+  verify_elf(fobj);
+  parse_ehdr(fobj, AccessFile);
+  parse_phdrs(fobj, AccessFile);
+  parse_shdrs(fobj, AccessFile);
+  parse_shstrtab(fobj, AccessFile);
+  parse_strtab(fobj, AccessFile);
+  parse_symtab(fobj, AccessFile);
+  parse_dynsym(fobj, AccessFile);
+  parse_relocations(fobj, AccessFile);
+  parse_dynstr(fobj, AccessFile);
+  parse_dynamic(fobj, AccessFile);
+  // deallocator(AccessFile);
 
   for (CmdStack* cmd = commands; cmd->name; cmd++){
     if (strcmp(cmd->name, cmd_name) == 0){

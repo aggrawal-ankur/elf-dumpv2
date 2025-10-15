@@ -3,8 +3,6 @@
 #include "dump.h"
 #include "mappings.h"
 
-int dump_all(ElfFile* AccessFile){}
-
 int general_dump(ElfFile* AccessFile){
   FILE* f_obj = fopen("./output/dump.c", "w");
   if (!f_obj){
@@ -151,7 +149,7 @@ int dump_shdrs(ElfFile* AccessFile){
   return 0;
 }
 
-int dump_shstrtab(ElfFile* AccessELF){
+int dump_shstrtab(ElfFile* AccessFile){
   FILE* f_obj = fopen("./output/dump.c", "a");
   if (!f_obj){
     fprintf(stderr, "Error: `f_obj` failed.\n  Inside `dump_shstrtab`\n");
@@ -160,19 +158,19 @@ int dump_shstrtab(ElfFile* AccessELF){
 
   fprintf(f_obj, "/* Section header string table (.shstrtab) flat-dump. */\n");
   fprintf(f_obj, "char* r_shstrtab = {\n  ");
-  for (int i = 0; i < AccessELF->r_shstr_count; i++){
-    if (AccessELF->r_shstrtab[i] == '\0'){
+  for (int i = 0; i < AccessFile->r_shstr_count; i++){
+    if (AccessFile->r_shstrtab[i] == '\0'){
       fprintf(f_obj, "'\\0', ");
       continue;
     }
-    fprintf(f_obj, "'%c', ", AccessELF->r_shstrtab[i]);
+    fprintf(f_obj, "'%c', ", AccessFile->r_shstrtab[i]);
   }
   fprintf(f_obj, "\n};\n\n");
 
   fprintf(f_obj, "/* Section header string table (.shstrtab) formatted-dump. */\n");
   fprintf(f_obj, "char** f_shstrtab = {\n");
-  for (int i = 0; i < AccessELF->f_shstr_count; i++){
-    fprintf(f_obj, "  \"%s\",\n", AccessELF->f_shstrtab[i]);
+  for (int i = 0; i < AccessFile->f_shstr_count; i++){
+    fprintf(f_obj, "  \"%s\",\n", AccessFile->f_shstrtab[i]);
   }
   fprintf(f_obj, "};\n\n\n");
 
@@ -180,7 +178,7 @@ int dump_shstrtab(ElfFile* AccessELF){
   return 0;
 }
 
-int dump_strtab(ElfFile* AccessELF){
+int dump_strtab(ElfFile* AccessFile){
   FILE* f_obj = fopen("./output/dump.c", "a");
   if (!f_obj){
     fprintf(stderr, "Error: `f_obj` failed.\n  Inside `dump_strtab`\n");
@@ -190,20 +188,20 @@ int dump_strtab(ElfFile* AccessELF){
   fprintf(f_obj, "/* String table (.strtab) flat-dump. */\n");
   fprintf(f_obj, "char* r_strtab = {\n  ");
 
-  for (int i = 0; i < AccessELF->r_str_count; i++){
-    if (AccessELF->r_strtab[i] == '\0'){
+  for (int i = 0; i < AccessFile->r_str_count; i++){
+    if (AccessFile->r_strtab[i] == '\0'){
       fprintf(f_obj, "'\\0', ");
       continue;
     }
-    fprintf(f_obj, "'%c', ", AccessELF->r_strtab[i]);
+    fprintf(f_obj, "'%c', ", AccessFile->r_strtab[i]);
   }
   fprintf(f_obj, "\n};\n\n");
 
   fprintf(f_obj, "/* String table (.strtab) formatted-dump. */\n");
   fprintf(f_obj, "char** f_strtab = {\n");
 
-  for (int i = 0; i < AccessELF->f_str_count; i++){
-    fprintf(f_obj, "  \"%s\",\n", AccessELF->f_strtab[i]);
+  for (int i = 0; i < AccessFile->f_str_count; i++){
+    fprintf(f_obj, "  \"%s\",\n", AccessFile->f_strtab[i]);
   }
   fprintf(f_obj, "};\n\n\n");
 
@@ -309,7 +307,7 @@ int dump_dynsym(ElfFile* AccessFile){
   return 0;
 }
 
-int dump_relocations(ElfFile* AccessELF){
+int dump_relocations(ElfFile* AccessFile){
   FILE* f_obj = fopen("./output/dump.c", "a");
   if (!f_obj){
     fprintf(stderr, "Error: `f_obj` failed.\n  Inside `dump_relocations`\n");
@@ -318,20 +316,20 @@ int dump_relocations(ElfFile* AccessELF){
 
   fprintf(f_obj, "/* Eager Binding Relocations Table (.rela.dyn) dump. */\n");
   fprintf(f_obj, "Elf64_Rela rela_dyn = {\n");
-  for (int i = 0; i < AccessELF->reladyn_count; i++){
+  for (int i = 0; i < AccessFile->reladyn_count; i++){
     fprintf(f_obj, "  {\n");
-    fprintf(f_obj, "    /* r_offset       */     %" PRIu64 "       /* offset (in decimal) in the binary */,\n\n", AccessELF->reladyn[i].r_offset);
-    fprintf(f_obj, "    /* r_info         */ {               /* %" PRIx64 ",\n", AccessELF->reladyn[i].r_info);
+    fprintf(f_obj, "    /* r_offset       */     %" PRIu64 "       /* offset (in decimal) in the binary */,\n\n", AccessFile->reladyn[i].r_offset);
+    fprintf(f_obj, "    /* r_info         */ {               /* %" PRIx64 ",\n", AccessFile->reladyn[i].r_info);
 
     for (int j = 0; j < 40; j++){
-      if ((AccessELF->reladyn[i].r_info & 0xffffffff) == rtypes[j].value){
-        fprintf(f_obj, "      /* rel_type     */     %" PRIu64 "           /* %s */,\n", AccessELF->reladyn[i].r_info & 0xffffffff, rtypes[j].macro);
+      if ((AccessFile->reladyn[i].r_info & 0xffffffff) == rtypes[j].value){
+        fprintf(f_obj, "      /* rel_type     */     %" PRIu64 "           /* %s */,\n", AccessFile->reladyn[i].r_info & 0xffffffff, rtypes[j].macro);
         break;
       }
     }
-    fprintf(f_obj, "      /* sym_idx      */     %" PRIu64 ",\n", AccessELF->reladyn[i].r_info  >> 32);
+    fprintf(f_obj, "      /* sym_idx      */     %" PRIu64 ",\n", AccessFile->reladyn[i].r_info  >> 32);
     fprintf(f_obj, "    },\n\n");
-    fprintf(f_obj, "    /* r_addend       */     %" PRIi64 ",\n", AccessELF->reladyn[i].r_addend);
+    fprintf(f_obj, "    /* r_addend       */     %" PRIi64 ",\n", AccessFile->reladyn[i].r_addend);
     fprintf(f_obj, "  },\n");
   }
 
@@ -339,20 +337,20 @@ int dump_relocations(ElfFile* AccessELF){
 
   fprintf(f_obj, "/* Lazy Binding Relocations Table (.rela.plt) dump. */\n");
   fprintf(f_obj, "Elf64_Rela rela_plt = {\n");
-  for (int i = 0; i < AccessELF->relaplt_count; i++){
+  for (int i = 0; i < AccessFile->relaplt_count; i++){
     fprintf(f_obj, "  {\n");
-    fprintf(f_obj, "    /* r_offset       */     %" PRIu64 "       /* offset (in decimal) in the binary */,\n\n", AccessELF->reladyn[i].r_offset);
-    fprintf(f_obj, "    /* r_info         */ {               /* %" PRIx64 ",\n", AccessELF->relaplt[i].r_info);
+    fprintf(f_obj, "    /* r_offset       */     %" PRIu64 "       /* offset (in decimal) in the binary */,\n\n", AccessFile->reladyn[i].r_offset);
+    fprintf(f_obj, "    /* r_info         */ {               /* %" PRIx64 ",\n", AccessFile->relaplt[i].r_info);
 
     for (int j = 0; j < 40; j++){
-      if ((AccessELF->relaplt[i].r_info & 0xffffffff) == rtypes[j].value){
-        fprintf(f_obj, "      /* rel_type     */     %" PRIu64 "           /* %s */,\n", AccessELF->relaplt[i].r_info & 0xffffffff, rtypes[j].macro);
+      if ((AccessFile->relaplt[i].r_info & 0xffffffff) == rtypes[j].value){
+        fprintf(f_obj, "      /* rel_type     */     %" PRIu64 "           /* %s */,\n", AccessFile->relaplt[i].r_info & 0xffffffff, rtypes[j].macro);
         break;
       }
     }
-    fprintf(f_obj, "      /* sym_idx      */     %" PRIu64 ",\n", AccessELF->relaplt[i].r_info  >> 32);
+    fprintf(f_obj, "      /* sym_idx      */     %" PRIu64 ",\n", AccessFile->relaplt[i].r_info  >> 32);
     fprintf(f_obj, "    },\n\n");
-    fprintf(f_obj, "    /* r_addend       */     %" PRIi64 ",\n", AccessELF->relaplt[i].r_addend);
+    fprintf(f_obj, "    /* r_addend       */     %" PRIi64 ",\n", AccessFile->relaplt[i].r_addend);
     fprintf(f_obj, "  },\n");
   }
 
@@ -362,7 +360,7 @@ int dump_relocations(ElfFile* AccessELF){
   return 0;
 }
 
-int dump_dynstr(ElfFile* AccessELF){
+int dump_dynstr(ElfFile* AccessFile){
   FILE* f_obj = fopen("./output/dump.c", "a");
   if (!f_obj){
     fprintf(stderr, "Error: `f_obj` failed.\n  Inside `dump_dynstr`\n");
@@ -372,20 +370,20 @@ int dump_dynstr(ElfFile* AccessELF){
   fprintf(f_obj, "/* Dynamic String Table (.dynstr) flat-dump. */\n");
   fprintf(f_obj, "char* r_dynstr = {\n  ");
 
-  for (int i = 0; i < AccessELF->r_dstr_count; i++){
-    if (AccessELF->r_dynstr[i] == '\0'){
+  for (int i = 0; i < AccessFile->r_dstr_count; i++){
+    if (AccessFile->r_dynstr[i] == '\0'){
       fprintf(f_obj, "'\\0', ");
       continue;
     }
-    fprintf(f_obj, "'%c', ", AccessELF->r_dynstr[i]);
+    fprintf(f_obj, "'%c', ", AccessFile->r_dynstr[i]);
   }
   fprintf(f_obj, "\n};\n\n");
 
   fprintf(f_obj, "/* Dynamic String Table (.dynstr) formatted-dump. */\n");
   fprintf(f_obj, "char** f_dynstr = {\n");
 
-  for (int i = 0; i < AccessELF->f_dstr_count; i++){
-    fprintf(f_obj, "  \"%s\",\n", AccessELF->f_dynstr[i]);
+  for (int i = 0; i < AccessFile->f_dstr_count; i++){
+    fprintf(f_obj, "  \"%s\",\n", AccessFile->f_dynstr[i]);
   }
   fprintf(f_obj, "};\n\n\n");
 
@@ -393,7 +391,7 @@ int dump_dynstr(ElfFile* AccessELF){
   return 0;
 }
 
-int dump_dynamic(ElfFile* AccessELF){
+int dump_dynamic(ElfFile* AccessFile){
   FILE* f_obj = fopen("./output/dump.c", "a");
   if (!f_obj){
     fprintf(stderr, "Error: `f_obj` failed.\n  Inside `dump_dynstr`\n");
@@ -403,17 +401,17 @@ int dump_dynamic(ElfFile* AccessELF){
   fprintf(f_obj, "/* Dynamic section dump. */\n");
   fprintf(f_obj, "Elf64_Dyn dynamic = {\n");
 
-  for (int i = 0; i < AccessELF->dyn_ent; i++){
+  for (int i = 0; i < AccessFile->dyn_ent; i++){
     fprintf(f_obj, "  {\n");
     for (int k = 0; k < 47; k++){
-      if (AccessELF->dynamic[i].d_tag == d_dtypes[k].value){
-        fprintf(f_obj, "    /* d_tag */        %" PRIi64 "    /* entry type, %s */,\n", AccessELF->dynamic[i].d_tag, d_dtypes[k].macro);
+      if (AccessFile->dynamic[i].d_tag == d_dtypes[k].value){
+        fprintf(f_obj, "    /* d_tag */        %" PRIi64 "    /* entry type, %s */,\n", AccessFile->dynamic[i].d_tag, d_dtypes[k].macro);
         break;
       }
     }
     fprintf(f_obj, "    /* d_un  */   {\n");
-    fprintf(f_obj, "      /* d_ptr */      %" PRIu64 "    /* address value (in decimal) */,\n", AccessELF->dynamic[i].d_un.d_ptr);
-    fprintf(f_obj, "      /* d_val */      %" PRIu64 "    /* integer value,  */,\n", AccessELF->dynamic[i].d_un.d_val);
+    fprintf(f_obj, "      /* d_ptr */      %" PRIu64 "    /* address value (in decimal) */,\n", AccessFile->dynamic[i].d_un.d_ptr);
+    fprintf(f_obj, "      /* d_val */      %" PRIu64 "    /* integer value,  */,\n", AccessFile->dynamic[i].d_un.d_val);
     fprintf(f_obj, "    }\n");
     fprintf(f_obj, "  },\n");
   }
@@ -423,5 +421,42 @@ int dump_dynamic(ElfFile* AccessELF){
   return 0;
 }
 
-int dump_reladyn(ElfFile* AccessFile);
-int dump_relaplt(ElfFile* AccessFile);
+int dump_all(ElfFile* AccessFile){
+  if (general_dump(AccessFile) != 0){
+    fprintf(stderr, "Error in dump_general \n");
+  }
+  if (dump_ehdr(AccessFile) != 0){
+    fprintf(stderr, "Error in dump_ehdr \n");
+  }
+  if (dump_phdrs(AccessFile) != 0){
+    fprintf(stderr, "Error in dump_phdrs \n");
+  }
+  if (dump_shdrs(AccessFile) != 0){
+    fprintf(stderr, "Error in dump_shdrs \n");
+  }
+  if (dump_shstrtab(AccessFile) != 0){
+    fprintf(stderr, "Error in dump_shstrtab \n");
+  }
+  if (dump_strtab(AccessFile) != 0){
+    fprintf(stderr, "Error in dump_strtab \n");
+  }
+  if (dump_symtab(AccessFile) != 0){
+    fprintf(stderr, "Error in dump_symtab \n");
+  }
+  if (dump_dynsym(AccessFile) != 0){
+    fprintf(stderr, "Error in dump_dynsym \n");
+  }
+  if (dump_relocations(AccessFile) != 0){
+    fprintf(stderr, "Error in dump_relocs \n");
+  }
+  if (dump_dynstr(AccessFile) != 0){
+    fprintf(stderr, "Error in dump_dynstr \n");
+  }
+  if (dump_dynamic(AccessFile) != 0){
+    fprintf(stderr, "Error in dump_dynamic \n");
+  }
+  return 0;
+}
+
+int dump_reladyn(ElfFile* AccessFile){return 0;}
+int dump_relaplt(ElfFile* AccessFile){return 0;}

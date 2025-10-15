@@ -52,10 +52,10 @@ int parse_shdrs(FILE* f_obj, ElfFile* AccessFile);
 int parse_shstrtab(FILE* f_obj, ElfFile* AccessFile);
 int parse_strtab(FILE* f_obj, ElfFile* AccessFile);
 int parse_symtab(FILE* f_obj, ElfFile* AccessFile);
-int parse_dynsym(FILE* f_obj, ElfFile* AccessELF);
-int parse_relocations(FILE* f_obj, ElfFile* AccessELF);
-int parse_dynstr(FILE* f_obj, ElfFile* AccessELF);
-int parse_dynamic(FILE* f_obj, ElfFile* AccessELF);
-int deallocator(ElfFile* AccessELF);
+int parse_dynsym(FILE* f_obj, ElfFile* AccessFile);
+int parse_relocations(FILE* f_obj, ElfFile* AccessFile);
+int parse_dynstr(FILE* f_obj, ElfFile* AccessFile);
+int parse_dynamic(FILE* f_obj, ElfFile* AccessFile);
+// int deallocator(ElfFile* AccessFile);
 
 #endif
