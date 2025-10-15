@@ -1,5 +1,5 @@
-#ifndef DUMP_ELF
-#define DUMP_ELF
+#ifndef DUMP_H
+#define DUMP_H
 
 #include "../core_api/parser.h"
 
@@ -14,5 +14,8 @@ int dump_dynsym(ElfFile* AccessFile);
 int dump_relocations(ElfFile* AccessELF);
 int dump_dynstr(ElfFile* AccessELF);
 int dump_dynamic(ElfFile* AccessELF);
+int dump_reladyn(ElfFile* AccessFile);
+int dump_relaplt(ElfFile* AccessFile);
+int dump_all(ElfFile* AccessFile);
 
 #endif

@@ -3,6 +3,8 @@
 #include "dump.h"
 #include "mappings.h"
 
+int dump_all(ElfFile* AccessFile){}
+
 int general_dump(ElfFile* AccessFile){
   FILE* f_obj = fopen("./output/dump.c", "w");
   if (!f_obj){
@@ -420,3 +422,6 @@ int dump_dynamic(ElfFile* AccessELF){
   fclose(f_obj);
   return 0;
 }
+
+int dump_reladyn(ElfFile* AccessFile);
+int dump_relaplt(ElfFile* AccessFile);

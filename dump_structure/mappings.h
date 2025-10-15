@@ -1,5 +1,5 @@
-#ifndef MAPPINGS
-#define MAPPINGS
+#ifndef MAPPINGS_H
+#define MAPPINGS_H
 
 #include <inttypes.h>
 
