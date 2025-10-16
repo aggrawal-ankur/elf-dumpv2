@@ -1,6 +1,20 @@
 #ifndef DUMP_H
 #define DUMP_H
 
+/* Macros for ehdr */
+
+// Part1
+#define _ePRINT(fo, idx, name, value)  fprintf(fo, "    /* [%2d] %-12s: */  %d,\n", idx, name, value)
+#define _exPRINT(fo, idx, name, value) fprintf(fo, "    /* [%2d] %-12s: */  0x%x,\n", idx, name, value)
+#define _eIPRINT(fo, idx, name, value, interp) fprintf(fo, "    /* [%2d] %-12s: */  %x,     /* %s */\n", idx, name, value, interp)
+#define _eIxPRINT(fo, idx, name, value, interp) fprintf(fo, "    /* [%2d] %-12s: */  0x%x,   /* %s */\n", idx, name, value, interp)
+
+// Part 2
+#define _PRINT(fo, name, fmt, value, comment) fprintf(fo, "  %-14s = %-10" fmt ",  %s\n", name, value, comment)
+#define _dPRINT(fo, name, fmt, value, comment) fprintf(fo, "  %-14s = %-10" fmt ",  %s\n", name, value, comment)
+#define _xPRINT(fo, name, fmt, value, comment) fprintf(fo, "  %-14s = 0x%-8" fmt ",  %s\n", name, value, comment)
+#define _cPRINT(fo, name, fmt, value, comment) fprintf(fo, "  %-14s = %-10" fmt ",  /* %s */\n", name, value, comment)
+
 #include "../core_api/parser.h"
 
 int general_dump(ElfFile* AccessFile);

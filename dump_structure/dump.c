@@ -3,7 +3,7 @@
 #include "dump.h"
 #include "mappings.h"
 
-#define _PRINT(fo, name, fmt, value, comment) fprintf(fo, "  %-14s = %-10" fmt ",  /* %s */\n", name, value, comment)
+char* identvals[] =  {"EI_MAG0", "EI_MAG1", "EI_MAG2", "EI_MAG3", "EI_CLASS", "EI_DATA", "EI_VERSION", "EI_PAD", "EI_NIDENT"};
 
 int general_dump(ElfFile* AccessFile){
   FILE* fobj = fopen("./output/cdump.c", "w");
@@ -28,37 +28,52 @@ int dump_ehdr(ElfFile* AccessFile){
 
   fprintf(fobj, "Elf64_Ehdr ehdr = {\n");
 
-  fprintf(fobj, "  e_ident[16] =  {\n    ");
+  fprintf(fobj, "  e_ident[16] =  {\n");
   for (int i = 0; i < 16; i++){
-    fprintf(fobj, "0x%02x%s", AccessFile->ehdr->e_ident[i], (i == 15) ? "" : ", ");
+    switch(i){
+      case 0: case 1: case 2: case 3:
+        _exPRINT(fobj, i, identvals[i], AccessFile->ehdr->e_ident[i]);
+        break;
+        case 4:
+        _eIPRINT(fobj, i, identvals[i], AccessFile->ehdr->e_ident[i], d_class[AccessFile->ehdr->e_ident[i]].macro);
+        break;
+        case 5:
+        _eIPRINT(fobj, i, identvals[i], AccessFile->ehdr->e_ident[i], ei_data[AccessFile->ehdr->e_ident[i]].macro);
+        break;
+        case 6:
+        _eIPRINT(fobj, i, identvals[i], AccessFile->ehdr->e_ident[i], (1 == 0) ? "EV_NONE" : "EV_CURRENT");
+        break;
+      default:
+        _exPRINT(fobj, i, "EI_PAD", AccessFile->ehdr->e_ident[i]);
+    }
   }
-  fprintf(fobj, "\n  },\n");
+  fprintf(fobj, "  },\n");
 
   for (int i = 0; i < ET_NUM; i++){
     if (d_ehtypes[i].value == AccessFile->ehdr->e_type){
-      _PRINT(fobj, "e_type", PRIu16, AccessFile->ehdr->e_type, d_ehtypes[i].macro);
+      _cPRINT(fobj, "e_type", PRIu16, AccessFile->ehdr->e_type, d_ehtypes[i].macro);
       break;
     }
   }
 
   for (int i = 0; i < 8; i++){
     if (d_ehmachines[i].value == AccessFile->ehdr->e_machine){
-      _PRINT(fobj, "e_machine", PRIu16, AccessFile->ehdr->e_machine, d_ehmachines[i].macro);
+      _cPRINT(fobj, "e_machine", PRIu16, AccessFile->ehdr->e_machine, d_ehmachines[i].macro);
       break;
     }
   }
 
-  _PRINT(fobj, "e_version",   PRIu32, AccessFile->ehdr->e_version, (1 == 0) ? "EV_NONE" : "EV_CURRENT");
-  _PRINT(fobj, "e_ehsize",    PRIu16, AccessFile->ehdr->e_ehsize,    "size (in bytes)");
-  _PRINT(fobj, "e_entry",     PRIu64, AccessFile->ehdr->e_entry,     "(bytes into file)");
-  _PRINT(fobj, "e_phoff",     PRIu64, AccessFile->ehdr->e_phoff,     "(bytes into file)");
-  _PRINT(fobj, "e_phnum",     PRIu16, AccessFile->ehdr->e_phnum,     "");
-  _PRINT(fobj, "e_phentsize", PRIu16, AccessFile->ehdr->e_phentsize, "size (in bytes)");
-  _PRINT(fobj, "e_shoff",     PRIu64, AccessFile->ehdr->e_shoff,     "(bytes into file)");
-  _PRINT(fobj, "e_shnum",     PRIu16, AccessFile->ehdr->e_shnum,     "");
-  _PRINT(fobj, "e_shentsize", PRIu16, AccessFile->ehdr->e_shentsize, "size (in bytes)");
-  _PRINT(fobj, "e_shstrndx",  PRIu16, AccessFile->ehdr->e_shstrndx,  "");
-  _PRINT(fobj, "e_flags",     PRIu32, AccessFile->ehdr->e_flags,     "");
+  _dPRINT(fobj, "e_version",   PRIu32, AccessFile->ehdr->e_version, (1 == 0) ? "/* EV_NONE */" : "/* EV_CURRENT */");
+  _dPRINT(fobj, "e_ehsize",    PRIu16, AccessFile->ehdr->e_ehsize,    "/* size (in bytes) */");
+  _xPRINT(fobj, "e_entry",     PRIx64, AccessFile->ehdr->e_entry,     "/* bytes into file */");
+  _dPRINT(fobj, "e_phoff",     PRIu64, AccessFile->ehdr->e_phoff,     "/* bytes into file */");
+  _dPRINT(fobj, "e_phnum",     PRIu16, AccessFile->ehdr->e_phnum,     "");
+  _dPRINT(fobj, "e_phentsize", PRIu16, AccessFile->ehdr->e_phentsize, "/* size (in bytes) */");
+  _dPRINT(fobj, "e_shoff",     PRIu64, AccessFile->ehdr->e_shoff,     "/* bytes into file */");
+  _dPRINT(fobj, "e_shnum",     PRIu16, AccessFile->ehdr->e_shnum,     "");
+  _dPRINT(fobj, "e_shentsize", PRIu16, AccessFile->ehdr->e_shentsize, "/* size (in bytes) */");
+  _dPRINT(fobj, "e_shstrndx",  PRIu16, AccessFile->ehdr->e_shstrndx,  "");
+  _xPRINT(fobj, "e_flags",     PRIu32, AccessFile->ehdr->e_flags,     "");
   fprintf(fobj, "};\n\n");
 
   fclose(fobj);

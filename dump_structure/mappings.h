@@ -9,6 +9,8 @@ struct Mapp {
 };
 
 extern struct Mapp d_ehtypes[];
+extern struct Mapp d_class[];
+extern struct Mapp ei_data[];
 extern struct Mapp d_ehmachines[];
 extern struct Mapp d_phtypes[];
 extern struct Mapp d_phflags[];

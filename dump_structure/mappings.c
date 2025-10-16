@@ -6,11 +6,27 @@ struct Mapp d_ehtypes[] = {
   {2, "ET_EXEC"},
   {3, "ET_DYN"},
   {4, "ET_CORE"},
-  {5, "ET_NUM"}
+  {5, "ET_NUM"},
+  {0xff00, "ET_LOPROC"},
+  {0xffff, "ET_HIPROC"},
+};
+
+struct Mapp d_class[] = {
+  {0, "ELFCLASSNONE"},
+  {1, "ELFCLASS32"},
+  {2, "ELFCLASS64"},
+};
+
+struct Mapp ei_data[] = {
+  {0, "ELFDATANONE"},
+  {1, "ELFDATA2LSB"},
+  {2, "ELFDATA2MSB"},
 };
 
 struct Mapp d_ehmachines[] = {
-  {0, "EM_NONE"},
+  {0, "ET_NONE"},
+  {1, "EM_M32"},
+  {2, "EM_SPARC"},
   {3, "EM_386"},
   {7, "EM_860"},
   {19, "EM_960"},
