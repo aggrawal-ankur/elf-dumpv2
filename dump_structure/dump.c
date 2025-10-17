@@ -425,21 +425,22 @@ int dump_dynamic(ElfFile* AccessFile){
     return -1;
   }
 
-  fprintf(fobj, "/* Dynamic section dump. */\n");
   fprintf(fobj, "Elf64_Dyn dynamic = {\n");
 
   for (int i = 0; i < AccessFile->dyn_ent; i++){
+    fprintf(fobj, "  /* Dynamic Array Tag #%d */\n", i);
     fprintf(fobj, "  {\n");
-    for (int k = 0; k < 47; k++){
-      if (AccessFile->dynamic[i].d_tag == d_dtypes[k].value){
-        fprintf(fobj, "    /* d_tag */        %" PRIi64 "    /* entry type, %s */,\n", AccessFile->dynamic[i].d_tag, d_dtypes[k].macro);
+
+    for (struct DTypes* tags = d_dtypes; tags->macro != NULL; tags++){
+      if (AccessFile->dynamic[i].d_tag == tags->value){
+        _DPRINT(fobj, "d_tag", PRIi64, AccessFile->dynamic[i].d_tag, tags->macro);
         break;
       }
     }
-    fprintf(fobj, "    /* d_un  */   {\n");
-    fprintf(fobj, "      /* d_ptr */      %" PRIu64 "    /* address value (in decimal) */,\n", AccessFile->dynamic[i].d_un.d_ptr);
-    fprintf(fobj, "      /* d_val */      %" PRIu64 "    /* integer value,  */,\n", AccessFile->dynamic[i].d_un.d_val);
-    fprintf(fobj, "    }\n");
+
+    struct DTypes* tag = find_tag(AccessFile->dynamic[i].d_tag);
+    _D2PRINT(fobj, tag->d_un, PRIu64, AccessFile->dynamic[i].d_un.d_val, tag->interp);
+
     fprintf(fobj, "  },\n");
   }
   fprintf(fobj, "};\n\n");

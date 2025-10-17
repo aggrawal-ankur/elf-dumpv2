@@ -20,6 +20,15 @@ extern struct Mapp d_sttypes[];
 extern struct Mapp d_stbinds[];
 extern struct Mapp d_stvisible[];
 extern struct Mapp rtypes[];
-extern struct Mapp d_dtypes[];
+
+struct DTypes {
+  uint64_t value;
+  const char* macro;
+  const char* d_un;
+  const char* interp;
+};
+
+extern struct DTypes d_dtypes[];
+struct DTypes *find_tag(uint64_t v);
 
 #endif
