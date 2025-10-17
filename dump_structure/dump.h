@@ -24,6 +24,11 @@
 #define _SPRINT(fo, name, fmt, value, comment)  fprintf(fo, "    %-12s = %-10" fmt ",  /* %s */\n", name, value, comment)
 #define _SnPRINT(fo, name, fmt, value, comment)  fprintf(fo, "    %-12s = %-10" fmt ",  /* %s ", name, value, comment)
 
+/* Macros for .reladyn */
+#define _RPRINT(fo, name, fmt, value, comment)  fprintf(fo, "    %-12s = %-10" fmt ",  /* %s */\n", name, value, comment)
+#define _R2PRINT(fo, name, fmt, value, comment)  fprintf(fo, "    %-12s = %-10" fmt ",  /* %s ", name, value, comment)
+
+
 #include "../core_api/parser.h"
 
 int general_dump(ElfFile* AccessFile);

@@ -335,43 +335,47 @@ int dump_relocations(ElfFile* AccessFile){
     return -1;
   }
 
-  fprintf(fobj, "/* Eager Binding Relocations Table (.rela.dyn) dump. */\n");
   fprintf(fobj, "Elf64_Rela rela_dyn = {\n");
   for (int i = 0; i < AccessFile->reladyn_count; i++){
+    char* temp = AccessFile->r_strtab;
+    temp += AccessFile->symtab[AccessFile->reladyn[i].r_info >> 32].st_name;
+    fprintf(fobj, "  /* Entry #%d && Symbol: [%s] */\n", i, temp);
     fprintf(fobj, "  {\n");
-    fprintf(fobj, "    /* r_offset       */     %" PRIu64 "       /* offset (in decimal) in the binary */,\n\n", AccessFile->reladyn[i].r_offset);
-    fprintf(fobj, "    /* r_info         */ {               /* %" PRIx64 ",\n", AccessFile->reladyn[i].r_info);
+
+    _RPRINT(fobj, "r_offset",    PRIu64, AccessFile->reladyn[i].r_offset, "OFFSET to apply relocation at");
 
     for (int j = 0; j < 40; j++){
       if ((AccessFile->reladyn[i].r_info & 0xffffffff) == rtypes[j].value){
-        fprintf(fobj, "      /* rel_type     */     %" PRIu64 "           /* %s */,\n", AccessFile->reladyn[i].r_info & 0xffffffff, rtypes[j].macro);
+        _R2PRINT(fobj, "r_info.type", PRIx64, AccessFile->reladyn[i].r_info & 0xffffffff, "Relocation type");
+        fprintf(fobj, "[%s] */,\n", rtypes[j].macro);
         break;
       }
     }
-    fprintf(fobj, "      /* sym_idx      */     %" PRIu64 ",\n", AccessFile->reladyn[i].r_info  >> 32);
-    fprintf(fobj, "    },\n\n");
-    fprintf(fobj, "    /* r_addend       */     %" PRIi64 ",\n", AccessFile->reladyn[i].r_addend);
+    _RPRINT(fobj, "r_info.idx",  PRIu64, AccessFile->reladyn[i].r_info >> 32, "Symbol idx in the symbol table");
+    _RPRINT(fobj, "r_addend",    PRIi64, AccessFile->reladyn[i].r_addend, "Constant to be added to calculate the final value");
     fprintf(fobj, "  },\n");
   }
 
   fprintf(fobj, "};\n\n");
 
-  fprintf(fobj, "/* Lazy Binding Relocations Table (.rela.plt) dump. */\n");
   fprintf(fobj, "Elf64_Rela rela_plt = {\n");
   for (int i = 0; i < AccessFile->relaplt_count; i++){
+    char* temp = AccessFile->r_strtab;
+    temp += AccessFile->symtab[AccessFile->relaplt[i].r_info >> 32].st_name;
+    fprintf(fobj, "  /* Entry #%d && Symbol: [%s] */\n", i, temp);
     fprintf(fobj, "  {\n");
-    fprintf(fobj, "    /* r_offset       */     %" PRIu64 "       /* offset (in decimal) in the binary */,\n\n", AccessFile->reladyn[i].r_offset);
-    fprintf(fobj, "    /* r_info         */ {               /* %" PRIx64 ",\n", AccessFile->relaplt[i].r_info);
+
+    _RPRINT(fobj, "r_offset",    PRIu64, AccessFile->relaplt[i].r_offset, "OFFSET to apply relocation at");
 
     for (int j = 0; j < 40; j++){
       if ((AccessFile->relaplt[i].r_info & 0xffffffff) == rtypes[j].value){
-        fprintf(fobj, "      /* rel_type     */     %" PRIu64 "           /* %s */,\n", AccessFile->relaplt[i].r_info & 0xffffffff, rtypes[j].macro);
+        _R2PRINT(fobj, "r_info.type", PRIx64, AccessFile->relaplt[i].r_info & 0xffffffff, "Relocation type");
+        fprintf(fobj, "[%s] */,\n", rtypes[j].macro);
         break;
       }
     }
-    fprintf(fobj, "      /* sym_idx      */     %" PRIu64 ",\n", AccessFile->relaplt[i].r_info  >> 32);
-    fprintf(fobj, "    },\n\n");
-    fprintf(fobj, "    /* r_addend       */     %" PRIi64 ",\n", AccessFile->relaplt[i].r_addend);
+    _RPRINT(fobj, "r_info.idx",  PRIu64, AccessFile->relaplt[i].r_info >> 32, "Symbol idx in the symbol table");
+    _RPRINT(fobj, "r_addend",    PRIi64, AccessFile->relaplt[i].r_addend, "Constant to be added to calculate the final value");
     fprintf(fobj, "  },\n");
   }
 
