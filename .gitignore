@@ -2,3 +2,4 @@
 /.vscode
 elfdump
 output/
+dumpelf
