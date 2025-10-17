@@ -64,17 +64,17 @@ int dump_ehdr(ElfFile* AccessFile){
     }
   }
 
-  _dPRINT(fobj, "e_version",   PRIu32, AccessFile->ehdr->e_version, (1 == 0) ? "/* EV_NONE */" : "/* EV_CURRENT */");
-  _dPRINT(fobj, "e_ehsize",    PRIu16, AccessFile->ehdr->e_ehsize,    "/* size (in bytes) */");
-  _xPRINT(fobj, "e_entry",     PRIx64, AccessFile->ehdr->e_entry,     "/* bytes into file */");
-  _dPRINT(fobj, "e_phoff",     PRIu64, AccessFile->ehdr->e_phoff,     "/* bytes into file */");
-  _dPRINT(fobj, "e_phnum",     PRIu16, AccessFile->ehdr->e_phnum,     "");
-  _dPRINT(fobj, "e_phentsize", PRIu16, AccessFile->ehdr->e_phentsize, "/* size (in bytes) */");
-  _dPRINT(fobj, "e_shoff",     PRIu64, AccessFile->ehdr->e_shoff,     "/* bytes into file */");
-  _dPRINT(fobj, "e_shnum",     PRIu16, AccessFile->ehdr->e_shnum,     "");
-  _dPRINT(fobj, "e_shentsize", PRIu16, AccessFile->ehdr->e_shentsize, "/* size (in bytes) */");
-  _dPRINT(fobj, "e_shstrndx",  PRIu16, AccessFile->ehdr->e_shstrndx,  "");
-  _xPRINT(fobj, "e_flags",     PRIu32, AccessFile->ehdr->e_flags,     "");
+  _cPRINT(fobj, "e_version",   PRIu32, AccessFile->ehdr->e_version, (1 == 0) ? "EV_NONE" : "EV_CURRENT");
+  _dPRINT(fobj, "e_ehsize",    PRIu16, AccessFile->ehdr->e_ehsize,    "/* Size of file header (in bytes) */");
+  _xPRINT(fobj, "e_entry",     PRIx64, AccessFile->ehdr->e_entry,     "/* Bytes into file */");
+  _dPRINT(fobj, "e_phoff",     PRIu64, AccessFile->ehdr->e_phoff,     "/* Bytes into file */");
+  _dPRINT(fobj, "e_phnum",     PRIu16, AccessFile->ehdr->e_phnum,     "/* Number of program headers */");
+  _dPRINT(fobj, "e_phentsize", PRIu16, AccessFile->ehdr->e_phentsize, "/* Size of program headers (in bytes) */");
+  _dPRINT(fobj, "e_shoff",     PRIu64, AccessFile->ehdr->e_shoff,     "/* Bytes into file */");
+  _dPRINT(fobj, "e_shnum",     PRIu16, AccessFile->ehdr->e_shnum,     "/* Number of section headers */");
+  _dPRINT(fobj, "e_shentsize", PRIu16, AccessFile->ehdr->e_shentsize, "/* Size of section headers (in bytes) */");
+  _dPRINT(fobj, "e_shstrndx",  PRIu16, AccessFile->ehdr->e_shstrndx,  "/* Section header string table index in the section headers table */");
+  _xPRINT(fobj, "e_flags",     PRIu32, AccessFile->ehdr->e_flags,     "/* Flags */");
   fprintf(fobj, "};\n\n");
 
   fclose(fobj);
