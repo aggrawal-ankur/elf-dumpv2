@@ -133,6 +133,8 @@ struct Mapp d_sttypes[] = {
   {4, "STT_FILE"},
   {5, "STT_COMMON"},
   {6, "STT_TLS"},
+  {13, "LOPROC"},
+  {15, "HIPROC"},
 };
 
 struct Mapp d_stbinds[] = {
@@ -140,6 +142,8 @@ struct Mapp d_stbinds[] = {
   {1,  "STB_GLOBAL"},
   {2,  "STB_WEAK"},
   {10, "STB_GNU_UNIQUE"},
+  {13, "LOPROC"},
+  {15, "HIPROC"},
 };
 
 struct Mapp d_stvisible[] = {

@@ -20,6 +20,9 @@
 #define _fPRINT(fo, name, fmt, value, comment) fprintf(fo, "%-18s = %-10" fmt ",  %s ", name, value, comment)
 #define _sPRINT(fo, name, fmt, value, comment, off) fprintf(fo, "%-18s = %-10" fmt ",  %s %s", name, value, comment, off)
 
+/* Macros for .symtab */
+#define _SPRINT(fo, name, fmt, value, comment)  fprintf(fo, "    %-12s = %-10" fmt ",  /* %s */\n", name, value, comment)
+#define _SnPRINT(fo, name, fmt, value, comment)  fprintf(fo, "    %-12s = %-10" fmt ",  /* %s ", name, value, comment)
 
 #include "../core_api/parser.h"
 

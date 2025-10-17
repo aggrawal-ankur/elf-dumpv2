@@ -239,36 +239,38 @@ int dump_symtab(ElfFile* AccessFile){
   fprintf(fobj, "Elf64_Sym symtab = {\n");
 
   for (int i = 0; i < AccessFile->symtab_count; i++){
+    fprintf(fobj, "  /* ENTRY #%d */\n", i);
     fprintf(fobj, "  {\n");
-    fprintf(fobj, "    /* looped_idx   */     %d,     /* loop counter */\n", i);
-    fprintf(fobj, "    /* st_name      */     %" PRIu32 ",     /* offset (decimal ) in .strtab */\n\n", AccessFile->symtab[i].st_name);
-    fprintf(fobj, "    /* st_info      */ {          /* %d */\n", AccessFile->symtab[i].st_info);
+
+    _SnPRINT(fobj, "st_name", PRIu32, AccessFile->symtab[i].st_name, "OFFSET in .strtab, interpreted as");
+    char* temp = AccessFile->r_strtab;
+    temp += AccessFile->symtab[i].st_name;
+    fprintf(fobj, "[%s] */\n", temp);
 
     for (int j = 0; j < 7; j++){
       if ((AccessFile->symtab[i].st_info & 0xf) == d_sttypes[j].value){
-        fprintf(fobj, "      /* type       */     %d,     /* %s */\n", AccessFile->symtab[i].st_info & 0xf, d_sttypes[j].macro);
+        _SPRINT(fobj, "st_info.type", "d", AccessFile->symtab[i].st_info & 0xf, d_sttypes[j].macro);
         break;
       }
     }
 
     for (int k = 0; k < 4; k++){
       if ((AccessFile->symtab[i].st_info >> 4) == d_stbinds[k].value){
-        fprintf(fobj, "      /* binding    */     %d,     /* %s */\n", AccessFile->symtab[i].st_info >> 4, d_stbinds[k].macro);
-        break;
-      }
-    }
-    fprintf(fobj, "    },\n\n");
-    
-    for (int l = 0; l < 4; l++){
-      if ((AccessFile->symtab[i].st_other & 0x03) == d_stvisible[l].value){
-        fprintf(fobj, "    /* st_other     */     %d,     /* symbol visibility, %s */\n", AccessFile->symtab[i].st_other, d_stvisible[l].macro);
+        _SPRINT(fobj, "st_info.bind", "d", AccessFile->symtab[i].st_info >> 4, d_stbinds[k].macro);
         break;
       }
     }
 
-    fprintf(fobj, "    /* st_shdx      */     %" PRIu16 ",     /* section (idx) it is present in */\n", AccessFile->symtab[i].st_shndx);
-    fprintf(fobj, "    /* st_value     */     %" PRIu64 ",     /* symbol value (in decimal) */\n", AccessFile->symtab[i].st_value);
-    fprintf(fobj, "    /* st_size      */     %" PRIu64 ",     /* symbol size (in decimal) */\n", AccessFile->symtab[i].st_size);
+    for (int l = 0; l < 4; l++){
+      if ((AccessFile->symtab[i].st_other & 0x03) == d_stvisible[l].value){
+        _SPRINT(fobj, "st_other",     "d", AccessFile->symtab[i].st_other, d_stvisible[l].macro);
+        break;
+      }
+    }
+
+    _SPRINT(fobj, "st_shdx",  PRIu16, AccessFile->symtab[i].st_shndx, "Section (Idx) the symbol is present in");
+    _SPRINT(fobj, "st_value", PRIu64, AccessFile->symtab[i].st_value, "Symbol value");
+    _SPRINT(fobj, "st_size",  PRIu64, AccessFile->symtab[i].st_size,  "Symbol size");
     fprintf(fobj, "  },\n");
   }
   fprintf(fobj, "};\n\n\n");
