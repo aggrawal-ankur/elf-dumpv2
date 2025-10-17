@@ -88,32 +88,34 @@ int dump_phdrs(ElfFile* AccessFile){
     return -1;
   }
 
-  fprintf(fobj, "/* Program headers (phdrs) dump. */\n");
   fprintf(fobj, "Elf64_Phdr phdrs = {\n");
 
-  
   for (int i = 0; i < AccessFile->ehdr->e_phnum; i++){
+    fprintf(fobj, "  /* Program Header #%d */\n", i);
     fprintf(fobj, "  {\n");
 
     for (int j = 0; j < 22; j++){
       if (AccessFile->phdrs[i].p_type == d_phtypes[j].value){
-        fprintf(fobj, "    /* p_type      */     %" PRIu32 "      /* %s */,\n", AccessFile->phdrs[i].p_type, d_phtypes[j].macro);
+        _P1PRINT(fobj, "p_type",   PRIu32, AccessFile->phdrs[i].p_type, d_phtypes[j].macro);
+        // fprintf(fobj, "    /* p_type      */     %" PRIu32 "      /* %s */,\n", AccessFile->phdrs[i].p_type, d_phtypes[j].macro);
         break;
       }
     }
 
-    fprintf(fobj, "    /* p_flags     */     %" PRIu32 "      /* ", AccessFile->phdrs[i].p_flags);
+    _PPRINT(fobj, "p_offset", PRIu64, AccessFile->phdrs[i].p_offset, "Bytes into the file");
+    
+    _P3PRINT(fobj, "p_vaddr",  PRIx64, AccessFile->phdrs[i].p_vaddr,  "Virtual address");
+    _P3PRINT(fobj, "p_paddr",  PRIx64, AccessFile->phdrs[i].p_paddr,  "Physical address");
+    _PPRINT(fobj,  "p_filesz", PRIu64, AccessFile->phdrs[i].p_filesz, "Segment size in bytes");
+    _PPRINT(fobj,  "p_memsz",  PRIu64, AccessFile->phdrs[i].p_memsz,  "Segment size in bytes");
+
+    _P2PRINT(fobj, "p_flags",  PRIu32, AccessFile->phdrs[i].p_flags, "Memory protection flags:");
     if (AccessFile->phdrs[i].p_flags & d_phflags[0].value) fprintf(fobj, d_phflags[0].macro);
     if (AccessFile->phdrs[i].p_flags & d_phflags[1].value) fprintf(fobj, d_phflags[1].macro);
     if (AccessFile->phdrs[i].p_flags & d_phflags[2].value) fprintf(fobj, d_phflags[2].macro);
     fprintf(fobj, " */,\n");
 
-    fprintf(fobj, "    /* p_offset    */     %" PRIu64 "      /* bytes (in decimal) in the binary */,\n", AccessFile->phdrs[i].p_offset);
-    fprintf(fobj, "    /* p_vaddr     */     %" PRIu64 ",\n", AccessFile->phdrs[i].p_vaddr);
-    fprintf(fobj, "    /* p_paddr     */     %" PRIu64 ",\n", AccessFile->phdrs[i].p_paddr);
-    fprintf(fobj, "    /* p_filesz    */     %" PRIu64 "      /* size in (decimal) bytes */,\n", AccessFile->phdrs[i].p_filesz);
-    fprintf(fobj, "    /* p_memsz     */     %" PRIu64 "      /* size in (decimal) bytes */,\n", AccessFile->phdrs[i].p_memsz);
-    fprintf(fobj, "    /* p_align     */     %" PRIu64 ",\n", AccessFile->phdrs[i].p_align);
+    _PPRINT(fobj, "p_align",  PRIu64, AccessFile->phdrs[i].p_align,  "Alignment requirement");
     fprintf(fobj, "  },\n");
   }
   fprintf(fobj, "};\n\n\n");

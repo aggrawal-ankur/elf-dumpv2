@@ -22,11 +22,17 @@
 
 /* Macros for .symtab */
 #define _SPRINT(fo, name, fmt, value, comment)  fprintf(fo, "    %-12s = %-10" fmt ",  /* %s */\n", name, value, comment)
-#define _SnPRINT(fo, name, fmt, value, comment)  fprintf(fo, "    %-12s = %-10" fmt ",  /* %s ", name, value, comment)
+#define _SnPRINT(fo, name, fmt, value, comment) fprintf(fo, "    %-12s = %-10" fmt ",  /* %s ", name, value, comment)
 
-/* Macros for .reladyn */
+/* Macros for relocations */
 #define _RPRINT(fo, name, fmt, value, comment)  fprintf(fo, "    %-12s = %-10" fmt ",  /* %s */\n", name, value, comment)
-#define _R2PRINT(fo, name, fmt, value, comment)  fprintf(fo, "    %-12s = %-10" fmt ",  /* %s ", name, value, comment)
+#define _R2PRINT(fo, name, fmt, value, comment) fprintf(fo, "    %-12s = %-10" fmt ",  /* %s ", name, value, comment)
+
+/* Macros for phdrs */
+#define _PPRINT(fo, name, fmt, value, comment)  fprintf(fo, "    %-10s = %-10" fmt ",  /* %s */\n", name, value, comment)
+#define _P1PRINT(fo, name, fmt, value, comment)  fprintf(fo, "    %-10s = %-10" fmt ",  /* [%s] */\n", name, value, comment)
+#define _P2PRINT(fo, name, fmt, value, comment) fprintf(fo, "    %-10s = %-10" fmt ",  /* %s ", name, value, comment)
+#define _P3PRINT(fo, name, fmt, value, comment)  fprintf(fo, "    %-10s = 0x%-8" fmt ",  /* %s */\n", name, value, comment)
 
 
 #include "../core_api/parser.h"
