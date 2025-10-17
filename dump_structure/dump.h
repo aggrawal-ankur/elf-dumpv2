@@ -10,10 +10,16 @@
 #define _eIxPRINT(fo, idx, name, value, interp) fprintf(fo, "    /* [%2d] %-12s: */  0x%x,   /* %s */\n", idx, name, value, interp)
 
 // Part 2
-#define _PRINT(fo, name, fmt, value, comment) fprintf(fo, "  %-14s = %-10" fmt ",  %s\n", name, value, comment)
 #define _dPRINT(fo, name, fmt, value, comment) fprintf(fo, "  %-14s = %-10" fmt ",  %s\n", name, value, comment)
 #define _xPRINT(fo, name, fmt, value, comment) fprintf(fo, "  %-14s = 0x%-8" fmt ",  %s\n", name, value, comment)
-#define _cPRINT(fo, name, fmt, value, comment) fprintf(fo, "  %-14s = %-10" fmt ",  /* %s */\n", name, value, comment)
+#define _cPRINT(fo, name, fmt, value, comment) fprintf(fo, "  %-14s = %-10" fmt ",  /* [%s] */\n", name, value, comment)
+
+/* Macros for shdrs */
+#define _PRINT(fo, name, fmt, value, comment)  fprintf(fo, "%-18s = %-10" fmt ",  %s\n", name, value, comment)
+#define _iPRINT(fo, name, fmt, value, comment) fprintf(fo, "%-18s = %-10" fmt ",  /* [%s] */\n", name, value, comment)
+#define _fPRINT(fo, name, fmt, value, comment) fprintf(fo, "%-18s = %-10" fmt ",  %s ", name, value, comment)
+#define _sPRINT(fo, name, fmt, value, comment, off) fprintf(fo, "%-18s = %-10" fmt ",  %s %s", name, value, comment, off)
+
 
 #include "../core_api/parser.h"
 
