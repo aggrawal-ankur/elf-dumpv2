@@ -107,22 +107,22 @@ struct Mapp d_shtypes[] = {
 };
 
 struct Mapp d_shflags[] = {
-  {(1 << 0), "SHF_WRITE "},
-  {(1 << 1), "SHF_ALLOC "},
-  {(1 << 2), "SHF_EXECINSTR "},
-  {(1 << 4), "SHF_MERGE "},
-  {(1 << 5), "SHF_STRINGS "},
-  {(1 << 6), "SHF_INFO_LINK "},
-  {(1 << 7), "SHF_LINK_ORDER "},
-  {(1 << 8), "SHF_OS_NONCONFORMING "},
-  {(1 << 9), "SHF_GROUP "},
-  {(1 << 10), "SHF_TLS "},
-  {(1 << 11), "SHF_COMPRESSED "},
-  {0x0ff00000, "SHF_MASKOS "},
-  {0xf0000000, "SHF_MASKPROC "},
-  {(1 << 21), "SHF_GNU_RETAIN "},
-  {(1 << 30), "SHF_ORDERED "},
-  {(1U << 31), "SHF_EXCLUDE "},
+  {(1 << 0), "SHF_WRITE"},
+  {(1 << 1), "SHF_ALLOC"},
+  {(1 << 2), "SHF_EXECINSTR"},
+  {(1 << 4), "SHF_MERGE"},
+  {(1 << 5), "SHF_STRINGS"},
+  {(1 << 6), "SHF_INFO_LINK"},
+  {(1 << 7), "SHF_LINK_ORDER"},
+  {(1 << 8), "SHF_OS_NONCONFORMING"},
+  {(1 << 9), "SHF_GROUP"},
+  {(1 << 10), "SHF_TLS"},
+  {(1 << 11), "SHF_COMPRESSED"},
+  {0x0ff00000, "SHF_MASKOS"},
+  {0xf0000000, "SHF_MASKPROC"},
+  {(1 << 21), "SHF_GNU_RETAIN"},
+  {(1 << 30), "SHF_ORDERED"},
+  {(1U << 31), "SHF_EXCLUDE"},
 };
 
 struct Mapp d_sttypes[] = {
