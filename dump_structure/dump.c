@@ -118,7 +118,7 @@ int dump_phdrs(ElfFile* AccessFile){
     _PPRINT(fobj, "p_align",  PRIu64, AccessFile->phdrs[i].p_align,  "Alignment requirement");
     fprintf(fobj, "  },\n");
   }
-  fprintf(fobj, "};\n\n\n");
+  fprintf(fobj, "};\n\n");
 
   fclose(fobj);
   return 0;
@@ -164,7 +164,7 @@ int dump_shdrs(ElfFile* AccessFile){
 
     fprintf(fobj, "  },\n");
   }
-  fprintf(fobj, "};\n\n\n");
+  fprintf(fobj, "};\n\n");
 
   fclose(fobj);
   return 0;
@@ -193,7 +193,7 @@ int dump_shstrtab(ElfFile* AccessFile){
   for (int i = 0; i < AccessFile->f_shstr_count; i++){
     fprintf(fobj, "  \"%s\",\n", AccessFile->f_shstrtab[i]);
   }
-  fprintf(fobj, "};\n\n\n");
+  fprintf(fobj, "};\n\n");
 
   fclose(fobj);
   return 0;
@@ -224,7 +224,7 @@ int dump_strtab(ElfFile* AccessFile){
   for (int i = 0; i < AccessFile->f_str_count; i++){
     fprintf(fobj, "  \"%s\",\n", AccessFile->f_strtab[i]);
   }
-  fprintf(fobj, "};\n\n\n");
+  fprintf(fobj, "};\n\n");
 
   fclose(fobj);
   return 0;
@@ -274,7 +274,7 @@ int dump_symtab(ElfFile* AccessFile){
     _SPRINT(fobj, "st_size",  PRIu64, AccessFile->symtab[i].st_size,  "Symbol size");
     fprintf(fobj, "  },\n");
   }
-  fprintf(fobj, "};\n\n\n");
+  fprintf(fobj, "};\n\n");
 
   fclose(fobj);
   return 0;
@@ -324,7 +324,7 @@ int dump_dynsym(ElfFile* AccessFile){
     _SPRINT(fobj, "st_size",  PRIu64, AccessFile->dynsym[i].st_size,  "Symbol size");
     fprintf(fobj, "  },\n");
   }
-  fprintf(fobj, "};\n\n\n");
+  fprintf(fobj, "};\n\n");
 
   fclose(fobj);
   return 0;
@@ -381,7 +381,7 @@ int dump_relocations(ElfFile* AccessFile){
     fprintf(fobj, "  },\n");
   }
 
-  fprintf(fobj, "};\n\n\n");
+  fprintf(fobj, "};\n\n");
 
   fclose(fobj);
   return 0;
@@ -412,7 +412,7 @@ int dump_dynstr(ElfFile* AccessFile){
   for (int i = 0; i < AccessFile->f_dstr_count; i++){
     fprintf(fobj, "  \"%s\",\n", AccessFile->f_dynstr[i]);
   }
-  fprintf(fobj, "};\n\n\n");
+  fprintf(fobj, "};\n\n");
 
   fclose(fobj);
   return 0;
