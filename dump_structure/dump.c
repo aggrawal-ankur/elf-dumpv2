@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include <inttypes.h>
 #include "dump.h"
 #include "mappings.h"
@@ -28,7 +29,7 @@ int dump_ehdr(ElfFile* AccessFile){
 
   fprintf(fobj, "Elf64_Ehdr ehdr = {\n");
 
-  fprintf(fobj, "  e_ident[16] =  {\n");
+  fprintf(fobj, "  e_ident[16] = {\n");
   for (int i = 0; i < 16; i++){
     switch(i){
       case 0: case 1: case 2: case 3:
@@ -81,7 +82,7 @@ int dump_ehdr(ElfFile* AccessFile){
 }
 
 int dump_phdrs(ElfFile* AccessFile){
-  FILE* fobj = fopen("output/dump.c", "a");
+  FILE* fobj = fopen("output/cdump.c", "a");
   if (!fobj){
     fprintf(stderr, "Error: `fobj` failed.  Inside `dump_phdrs`\n ");
     return -1;
@@ -122,39 +123,43 @@ int dump_phdrs(ElfFile* AccessFile){
 }
 
 int dump_shdrs(ElfFile* AccessFile){
-  FILE* fobj = fopen("output/dump.c", "a");
+  FILE* fobj = fopen("output/cdump.c", "a");
   if (!fobj){
     fprintf(stderr, "Error: `fobj` failed. Inside `dump_shdrs`\n");
     return -1;
   }
 
-  fprintf(fobj, "/* Section headers (shdrs) dump. */\n");
   fprintf(fobj, "Elf64_Shdr shdrs = {\n");
 
   for (int i = 0; i < AccessFile->ehdr->e_shnum; i++){
     fprintf(fobj, "  {\n");
-    fprintf(fobj, "    /* sh_name         */     %" PRIu32 "       /* offset (in decimal) in section header string table */ ,\n", AccessFile->shdrs[i].sh_name);
+    
+    _fPRINT(fobj, "    sh_name", PRIu32, AccessFile->shdrs[i].sh_name, "/* OFFSET in .shstrtab, interpreted as");
+    char* temp = AccessFile->r_shstrtab;
+    temp += AccessFile->shdrs[i].sh_name;
+    fprintf(fobj, "[%s] */\n", temp);
 
     for (int j = 0; j < 36; j++){
       if (AccessFile->shdrs[i].sh_type == d_shtypes[j].value){
-        fprintf(fobj, "    /* sh_type         */     %" PRIu32 "         /* %s */,\n", AccessFile->shdrs[i].sh_type, d_shtypes[j].macro);
+        _iPRINT(fobj, "    sh_type", PRIu32, AccessFile->shdrs[i].sh_type, d_shtypes[j].macro);
         break;
       }
     }
 
-    fprintf(fobj, "    /* sh_flags        */     %" PRIu64 "         /* ", AccessFile->shdrs[i].sh_flags);
+    _fPRINT(fobj, "    sh_flags", PRIu64, AccessFile->shdrs[i].sh_flags, "/* BIT-MASKED value, interpreted as");
     for (int k = 0; k < 16; k++){
-      if (AccessFile->shdrs[i].sh_flags & d_shflags[k].value) fprintf(fobj, d_shflags[k].macro);
+      if (AccessFile->shdrs[i].sh_flags & d_shflags[k].value) fprintf(fobj, "[%s], ", d_shflags[k].macro);
     }
-    fprintf(fobj, " */,\n");
+    fprintf(fobj, " */\n");
 
-    fprintf(fobj, "    /* sh_addr         */     %" PRIu64 "     /* Section virtual addr at execution (in decimal) */,\n", AccessFile->shdrs[i].sh_addr);
-    fprintf(fobj, "    /* sh_offset       */     %" PRIu64 "     /* bytes (in decimal) in the binary */,\n", AccessFile->shdrs[i].sh_offset);
-    fprintf(fobj, "    /* sh_size         */     %" PRIu64 "         /* in bytes (decimal) */,\n", AccessFile->shdrs[i].sh_size);
-    fprintf(fobj, "    /* sh_link         */     %" PRIu32 ",\n", AccessFile->shdrs[i].sh_link);
-    fprintf(fobj, "    /* sh_info         */     %" PRIu32 ",\n", AccessFile->shdrs[i].sh_info);
-    fprintf(fobj, "    /* sh_addralign    */     %" PRIu64 ",\n", AccessFile->shdrs[i].sh_addralign);
-    fprintf(fobj, "    /* sh_entsize      */     %" PRIu64 "         /* in bytes (decimal) */,\n", AccessFile->shdrs[i].sh_entsize);
+    _PRINT(fobj, "    sh_addr",      PRIu64, AccessFile->shdrs[i].sh_addr,      "/* Virtual Address of this section entry */");
+    _PRINT(fobj, "    sh_offset",    PRIu64, AccessFile->shdrs[i].sh_offset,    "/* OFFSET in the file this section entry starts from */");
+    _PRINT(fobj, "    sh_size",      PRIu64, AccessFile->shdrs[i].sh_size,      "/* Size of this section (in bytes) */");
+    _PRINT(fobj, "    sh_link",      PRIu32, AccessFile->shdrs[i].sh_link,      "");
+    _PRINT(fobj, "    sh_info",      PRIu32, AccessFile->shdrs[i].sh_info,      "");
+    _PRINT(fobj, "    sh_addralign", PRIu64, AccessFile->shdrs[i].sh_addralign, "/* Section alignment requirement */");
+    _PRINT(fobj, "    sh_entsize",   PRIu64, AccessFile->shdrs[i].sh_entsize,   "/* The section has fixed size entries of this size (in bytes) */");
+
     fprintf(fobj, "  },\n");
   }
   fprintf(fobj, "};\n\n\n");
@@ -442,11 +447,11 @@ int dump_all(ElfFile* AccessFile){
   if (dump_ehdr(AccessFile) != 0){
     fprintf(stderr, "Error in dump_ehdr \n");
   }
-  if (dump_phdrs(AccessFile) != 0){
-    fprintf(stderr, "Error in dump_phdrs \n");
-  }
   if (dump_shdrs(AccessFile) != 0){
     fprintf(stderr, "Error in dump_shdrs \n");
+  }
+  if (dump_phdrs(AccessFile) != 0){
+    fprintf(stderr, "Error in dump_phdrs \n");
   }
   if (dump_shstrtab(AccessFile) != 0){
     fprintf(stderr, "Error in dump_shstrtab \n");
