@@ -1,5 +1,5 @@
-#include <stdio.h>
 #include "mappings.h"
+#define NULL ((void *)0)
 
 struct Mapp d_ehtypes[] = {
   {0, "ET_NONE"},
@@ -10,6 +10,7 @@ struct Mapp d_ehtypes[] = {
   {5, "ET_NUM"},
   {0xff00, "ET_LOPROC"},
   {0xffff, "ET_HIPROC"},
+  {-1, NULL},
 };
 
 struct Mapp d_class[] = {
@@ -35,6 +36,7 @@ struct Mapp d_ehmachines[] = {
   {62, "EM_X86_64"},
   {183, "EM_AARCH64"},
   {243, "EM_RISCV"},
+  {-1, NULL},
 };
 
 struct Mapp d_phtypes[] = {
@@ -59,7 +61,8 @@ struct Mapp d_phtypes[] = {
   {0x6fffffff, "PT_HISUNW"},
   {0x6fffffff, "PT_HIOS"},
   {0x70000000, "PT_LOPROC"},
-  {0x7fffffff, "PT_HIPROC"}
+  {0x7fffffff, "PT_HIPROC"},
+  {-1, NULL},
 };
 
 struct Mapp d_phflags[] = {
@@ -105,6 +108,7 @@ struct Mapp d_shtypes[] = {
   {0x7fffffff, "SHT_HIPROC"},
   {0x80000000, "SHT_LOUSER"},
   {0x8fffffff, "SHT_HIUSER"},
+  {-1, NULL},
 };
 
 struct Mapp d_shflags[] = {
@@ -124,6 +128,7 @@ struct Mapp d_shflags[] = {
   {(1 << 21), "SHF_GNU_RETAIN"},
   {(1 << 30), "SHF_ORDERED"},
   {(1U << 31), "SHF_EXCLUDE"},
+  {-1, NULL}
 };
 
 struct Mapp d_sttypes[] = {
@@ -136,6 +141,7 @@ struct Mapp d_sttypes[] = {
   {6, "STT_TLS"},
   {13, "LOPROC"},
   {15, "HIPROC"},
+  {-1, NULL},
 };
 
 struct Mapp d_stbinds[] = {
@@ -145,6 +151,7 @@ struct Mapp d_stbinds[] = {
   {10, "STB_GNU_UNIQUE"},
   {13, "LOPROC"},
   {15, "HIPROC"},
+  {-1, NULL},
 };
 
 struct Mapp d_stvisible[] = {
@@ -152,6 +159,7 @@ struct Mapp d_stvisible[] = {
   {1, "STV_INTERNAL"},
   {2, "STV_HIDDEN"},
   {3, "STV_PROTECTED"},
+  {-1, NULL},
 };
 
 struct Mapp rtypes[] = {
@@ -196,7 +204,8 @@ struct Mapp rtypes[] = {
   {38, "R_X86_64_RELATIVE64"},
   {41, "R_X86_64_GOTPCRELX"},
   {42, "R_X86_64_REX_GOTPCRELX"},
-  {43, "R_X86_64_NUM"}
+  {43, "R_X86_64_NUM"},
+  {-1, NULL},
 };
 
 struct DTypes d_dtypes[] = {

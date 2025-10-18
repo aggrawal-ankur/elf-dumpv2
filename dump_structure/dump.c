@@ -50,16 +50,16 @@ int dump_ehdr(ElfFile* AccessFile){
   }
   fprintf(fobj, "  },\n");
 
-  for (int i = 0; i < ET_NUM; i++){
-    if (d_ehtypes[i].value == AccessFile->ehdr->e_type){
-      _cPRINT(fobj, "e_type", PRIu16, AccessFile->ehdr->e_type, d_ehtypes[i].macro);
+  for (struct Mapp* types = d_ehtypes; types->macro != NULL; types++){
+    if (types->value == AccessFile->ehdr->e_type){
+      _cPRINT(fobj, "e_type", PRIu16, AccessFile->ehdr->e_type, types->macro);
       break;
     }
   }
 
-  for (int i = 0; i < 8; i++){
-    if (d_ehmachines[i].value == AccessFile->ehdr->e_machine){
-      _cPRINT(fobj, "e_machine", PRIu16, AccessFile->ehdr->e_machine, d_ehmachines[i].macro);
+  for (struct Mapp* machines = d_ehmachines; machines->macro != NULL; machines++){
+    if (machines->value == AccessFile->ehdr->e_machine){
+      _cPRINT(fobj, "e_machine", PRIu16, AccessFile->ehdr->e_machine, machines->macro);
       break;
     }
   }
@@ -94,28 +94,26 @@ int dump_phdrs(ElfFile* AccessFile){
     fprintf(fobj, "  /* Program Header #%d */\n", i);
     fprintf(fobj, "  {\n");
 
-    for (int j = 0; j < 22; j++){
-      if (AccessFile->phdrs[i].p_type == d_phtypes[j].value){
-        _P1PRINT(fobj, "p_type",   PRIu32, AccessFile->phdrs[i].p_type, d_phtypes[j].macro);
-        // fprintf(fobj, "    /* p_type      */     %" PRIu32 "      /* %s */,\n", AccessFile->phdrs[i].p_type, d_phtypes[j].macro);
+    for (struct Mapp* types = d_phtypes; types->macro != NULL; types++){
+      if (AccessFile->phdrs[i].p_type == types->value){
+        _P1PRINT(fobj, "p_type",   PRIu32, AccessFile->phdrs[i].p_type, types->macro);
         break;
       }
     }
 
-    _PPRINT(fobj, "p_offset", PRIu64, AccessFile->phdrs[i].p_offset, "OFFSET in the file this segment starts from");
-    
+    _PPRINT(fobj,  "p_offset", PRIu64, AccessFile->phdrs[i].p_offset, "OFFSET in the file this segment starts from");
     _P3PRINT(fobj, "p_vaddr",  PRIx64, AccessFile->phdrs[i].p_vaddr,  "Virtual address");
     _P3PRINT(fobj, "p_paddr",  PRIx64, AccessFile->phdrs[i].p_paddr,  "Physical address");
     _PPRINT(fobj,  "p_filesz", PRIu64, AccessFile->phdrs[i].p_filesz, "Segment size in bytes");
     _PPRINT(fobj,  "p_memsz",  PRIu64, AccessFile->phdrs[i].p_memsz,  "Segment size in bytes");
 
-    _P2PRINT(fobj, "p_flags",  PRIu32, AccessFile->phdrs[i].p_flags, "Memory protection flags:");
+    _P2PRINT(fobj, "p_flags",  PRIu32, AccessFile->phdrs[i].p_flags,  "Memory protection flags:");
     if (AccessFile->phdrs[i].p_flags & d_phflags[0].value) fprintf(fobj, d_phflags[0].macro);
     if (AccessFile->phdrs[i].p_flags & d_phflags[1].value) fprintf(fobj, d_phflags[1].macro);
     if (AccessFile->phdrs[i].p_flags & d_phflags[2].value) fprintf(fobj, d_phflags[2].macro);
     fprintf(fobj, " */,\n");
 
-    _PPRINT(fobj, "p_align",  PRIu64, AccessFile->phdrs[i].p_align,  "Alignment requirement");
+    _PPRINT(fobj,  "p_align",  PRIu64, AccessFile->phdrs[i].p_align,  "Alignment requirement");
     fprintf(fobj, "  },\n");
   }
   fprintf(fobj, "};\n\n");
@@ -136,7 +134,7 @@ int dump_shdrs(ElfFile* AccessFile){
   for (int i = 0; i < AccessFile->ehdr->e_shnum; i++){
     fprintf(fobj, "  /* Section Header #%d */\n", i);
     fprintf(fobj, "  {\n");
-    
+
     _fPRINT(fobj, "    sh_name", PRIu32, AccessFile->shdrs[i].sh_name, "/* OFFSET in .shstrtab");
     if (i == 0) fprintf(fobj, "[SHT_NULL] */\n");
     else{
@@ -145,9 +143,9 @@ int dump_shdrs(ElfFile* AccessFile){
       fprintf(fobj, "[%s] */\n", temp);
     }
 
-    for (int j = 0; j < 36; j++){
-      if (AccessFile->shdrs[i].sh_type == d_shtypes[j].value){
-        _iPRINT(fobj, "    sh_type", PRIu32, AccessFile->shdrs[i].sh_type, d_shtypes[j].macro);
+    for (struct Mapp* types = d_shtypes; types->macro != NULL; types++){
+      if (AccessFile->shdrs[i].sh_type == types->value){
+        _iPRINT(fobj, "    sh_type", PRIu32, AccessFile->shdrs[i].sh_type, types->macro);
         break;
       }
     }
@@ -155,8 +153,8 @@ int dump_shdrs(ElfFile* AccessFile){
     _fPRINT(fobj, "    sh_flags", PRIu64, AccessFile->shdrs[i].sh_flags, "/* BIT-MASKED value, interpreted as");
     if (i == 0) fprintf(fobj, "[NO_FLAGS]");
     else {
-      for (int k = 0; k < 16; k++){
-        if (AccessFile->shdrs[i].sh_flags & d_shflags[k].value) fprintf(fobj, "[%s], ", d_shflags[k].macro);
+      for (struct Mapp* flags = d_shflags; flags->macro != NULL; flags++){
+        if (AccessFile->shdrs[i].sh_flags & flags->value) fprintf(fobj, "[%s], ", flags->macro);
       }
     }
     fprintf(fobj, " */\n");
@@ -186,6 +184,7 @@ int dump_shstrtab(ElfFile* AccessFile){
 
   fprintf(fobj, "/* Section header string table (.shstrtab) flat-dump. */\n");
   fprintf(fobj, "char* r_shstrtab = {\n  ");
+
   for (int i = 0; i < AccessFile->r_shstr_count; i++){
     if (AccessFile->r_shstrtab[i] == '\0'){
       fprintf(fobj, "'\\0', ");
@@ -255,23 +254,23 @@ int dump_symtab(ElfFile* AccessFile){
     temp += AccessFile->symtab[i].st_name;
     fprintf(fobj, "[%s] */\n", temp);
 
-    for (int j = 0; j < 7; j++){
-      if ((AccessFile->symtab[i].st_info & 0xf) == d_sttypes[j].value){
-        _SPRINT(fobj, "st_info.type", "d", AccessFile->symtab[i].st_info & 0xf, d_sttypes[j].macro);
+    for (struct Mapp* types = d_sttypes; types->macro != NULL; types++){
+      if ((AccessFile->symtab[i].st_info & 0xf) == types->value){
+        _SPRINT(fobj, "st_info.type", "d", AccessFile->symtab[i].st_info & 0xf, types->macro);
         break;
       }
     }
 
-    for (int k = 0; k < 4; k++){
-      if ((AccessFile->symtab[i].st_info >> 4) == d_stbinds[k].value){
-        _SPRINT(fobj, "st_info.bind", "d", AccessFile->symtab[i].st_info >> 4, d_stbinds[k].macro);
+    for (struct Mapp* bind = d_stbinds; bind->macro; bind++){
+      if ((AccessFile->symtab[i].st_info >> 4) == bind->value){
+        _SPRINT(fobj, "st_info.bind", "d", AccessFile->symtab[i].st_info >> 4, bind->macro);
         break;
       }
     }
 
-    for (int l = 0; l < 4; l++){
-      if ((AccessFile->symtab[i].st_other & 0x03) == d_stvisible[l].value){
-        _SPRINT(fobj, "st_other",     "d", AccessFile->symtab[i].st_other, d_stvisible[l].macro);
+    for (struct Mapp* vis = d_stvisible; vis->macro != NULL; vis++){
+      if ((AccessFile->symtab[i].st_other & 0x03) == vis->value){
+        _SPRINT(fobj, "st_other",     "d", AccessFile->symtab[i].st_other, vis->macro);
         break;
       }
     }
@@ -305,23 +304,23 @@ int dump_dynsym(ElfFile* AccessFile){
     temp += AccessFile->dynsym[i].st_name;
     fprintf(fobj, "[%s] */\n", temp);
 
-    for (int j = 0; j < 7; j++){
-      if ((AccessFile->dynsym[i].st_info & 0xf) == d_sttypes[j].value){
-        _SPRINT(fobj, "st_info.type", "d", AccessFile->dynsym[i].st_info & 0xf, d_sttypes[j].macro);
+    for (struct Mapp* types = d_sttypes; types->macro != NULL; types++){
+      if ((AccessFile->dynsym[i].st_info & 0xf) == types->value){
+        _SPRINT(fobj, "st_info.type", "d", AccessFile->dynsym[i].st_info & 0xf, types->macro);
         break;
       }
     }
 
-    for (int k = 0; k < 4; k++){
-      if ((AccessFile->dynsym[i].st_info >> 4) == d_stbinds[k].value){
-        _SPRINT(fobj, "st_info.bind", "d", AccessFile->dynsym[i].st_info >> 4, d_stbinds[k].macro);
+    for (struct Mapp* bind = d_stbinds; bind->macro; bind++){
+      if ((AccessFile->dynsym[i].st_info >> 4) == bind->value){
+        _SPRINT(fobj, "st_info.bind", "d", AccessFile->dynsym[i].st_info >> 4, bind->macro);
         break;
       }
     }
 
-    for (int l = 0; l < 4; l++){
-      if ((AccessFile->dynsym[i].st_other & 0x03) == d_stvisible[l].value){
-        _SPRINT(fobj, "st_other",     "d", AccessFile->dynsym[i].st_other, d_stvisible[l].macro);
+    for (struct Mapp* vis = d_stvisible; vis->macro != NULL; vis++){
+      if ((AccessFile->dynsym[i].st_other & 0x03) == vis->value){
+        _SPRINT(fobj, "st_other",     "d", AccessFile->dynsym[i].st_other, vis->macro);
         break;
       }
     }
@@ -345,28 +344,30 @@ int dump_reladyn(ElfFile* AccessFile){
   }
 
   fprintf(fobj, "Elf64_Rela rela_dyn = {\n");
+
   for (int i = 0; i < AccessFile->reladyn_count; i++){
     char* temp = AccessFile->r_strtab;
     temp += AccessFile->symtab[AccessFile->reladyn[i].r_info >> 32].st_name;
     fprintf(fobj, "  /* Entry #%d && Symbol: [%s] */\n", i, temp);
     fprintf(fobj, "  {\n");
-    
+
     _RPRINT(fobj, "r_offset",    PRIu64, AccessFile->reladyn[i].r_offset, "OFFSET to apply the relocation at");
 
-    for (int j = 0; j < 40; j++){
-      if ((AccessFile->reladyn[i].r_info & 0xffffffff) == rtypes[j].value){
+    for (struct Mapp* types = rtypes; rtypes->macro != NULL; types++){
+      if ((AccessFile->reladyn[i].r_info & 0xffffffff) == types->value){
         _R2PRINT(fobj, "r_info.type", PRIx64, AccessFile->reladyn[i].r_info & 0xffffffff, "Relocation type");
-        fprintf(fobj, "[%s] */,\n", rtypes[j].macro);
+        fprintf(fobj, "[%s] */,\n", types->macro);
         break;
       }
     }
+
     _RPRINT(fobj, "r_info.idx",  PRIu64, AccessFile->reladyn[i].r_info >> 32, "Symbol idx in the symbol table");
     _RPRINT(fobj, "r_addend",    PRIi64, AccessFile->reladyn[i].r_addend, "Constant to be added to calculate the final value");
     fprintf(fobj, "  },\n");
   }
-  
+
   fprintf(fobj, "};\n\n");
-  
+
   fclose(fobj);
   return 0;
 }
@@ -377,8 +378,9 @@ int dump_relaplt(ElfFile* AccessFile){
     fprintf(stderr, "Error: `fobj` failed.\n  Inside `dump_relocations`\n");
     return -1;
   }
-  
+
   fprintf(fobj, "Elf64_Rela rela_plt = {\n");
+
   for (int i = 0; i < AccessFile->relaplt_count; i++){
     char* temp = AccessFile->r_strtab;
     temp += AccessFile->symtab[AccessFile->relaplt[i].r_info >> 32].st_name;
@@ -387,13 +389,14 @@ int dump_relaplt(ElfFile* AccessFile){
 
     _RPRINT(fobj, "r_offset",    PRIu64, AccessFile->relaplt[i].r_offset, "OFFSET to apply the relocation at");
 
-    for (int j = 0; j < 40; j++){
-      if ((AccessFile->relaplt[i].r_info & 0xffffffff) == rtypes[j].value){
-        _R2PRINT(fobj, "r_info.type", PRIx64, AccessFile->relaplt[i].r_info & 0xffffffff, "Relocation type");
-        fprintf(fobj, "[%s] */,\n", rtypes[j].macro);
+    for (struct Mapp* types = rtypes; rtypes->macro != NULL; types++){
+      if ((AccessFile->relaplt->r_info & 0xffffffff) == types->value){
+        _R2PRINT(fobj, "r_info.type", PRIx64, AccessFile->relaplt->r_info & 0xffffffff, "Relocation type");
+        fprintf(fobj, "[%s] */,\n", types->macro);
         break;
       }
     }
+
     _RPRINT(fobj, "r_info.idx",  PRIu64, AccessFile->relaplt[i].r_info >> 32, "Symbol idx in the symbol table");
     _RPRINT(fobj, "r_addend",    PRIi64, AccessFile->relaplt[i].r_addend, "Constant to be added to calculate the final value");
     fprintf(fobj, "  },\n");
