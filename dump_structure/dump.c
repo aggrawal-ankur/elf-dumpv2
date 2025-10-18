@@ -102,7 +102,7 @@ int dump_phdrs(ElfFile* AccessFile){
       }
     }
 
-    _PPRINT(fobj, "p_offset", PRIu64, AccessFile->phdrs[i].p_offset, "Bytes into the file");
+    _PPRINT(fobj, "p_offset", PRIu64, AccessFile->phdrs[i].p_offset, "OFFSET in the file this segment starts from");
     
     _P3PRINT(fobj, "p_vaddr",  PRIx64, AccessFile->phdrs[i].p_vaddr,  "Virtual address");
     _P3PRINT(fobj, "p_paddr",  PRIx64, AccessFile->phdrs[i].p_paddr,  "Physical address");
@@ -134,12 +134,16 @@ int dump_shdrs(ElfFile* AccessFile){
   fprintf(fobj, "Elf64_Shdr shdrs = {\n");
 
   for (int i = 0; i < AccessFile->ehdr->e_shnum; i++){
+    fprintf(fobj, "  /* Section Header #%d */\n", i);
     fprintf(fobj, "  {\n");
     
-    _fPRINT(fobj, "    sh_name", PRIu32, AccessFile->shdrs[i].sh_name, "/* OFFSET in .shstrtab, interpreted as");
-    char* temp = AccessFile->r_shstrtab;
-    temp += AccessFile->shdrs[i].sh_name;
-    fprintf(fobj, "[%s] */\n", temp);
+    _fPRINT(fobj, "    sh_name", PRIu32, AccessFile->shdrs[i].sh_name, "/* OFFSET in .shstrtab");
+    if (i == 0) fprintf(fobj, "[SHT_NULL] */\n");
+    else{
+      char* temp = AccessFile->r_shstrtab;
+      temp += AccessFile->shdrs[i].sh_name;
+      fprintf(fobj, "[%s] */\n", temp);
+    }
 
     for (int j = 0; j < 36; j++){
       if (AccessFile->shdrs[i].sh_type == d_shtypes[j].value){
@@ -149,8 +153,11 @@ int dump_shdrs(ElfFile* AccessFile){
     }
 
     _fPRINT(fobj, "    sh_flags", PRIu64, AccessFile->shdrs[i].sh_flags, "/* BIT-MASKED value, interpreted as");
-    for (int k = 0; k < 16; k++){
-      if (AccessFile->shdrs[i].sh_flags & d_shflags[k].value) fprintf(fobj, "[%s], ", d_shflags[k].macro);
+    if (i == 0) fprintf(fobj, "[NO_FLAGS]");
+    else {
+      for (int k = 0; k < 16; k++){
+        if (AccessFile->shdrs[i].sh_flags & d_shflags[k].value) fprintf(fobj, "[%s], ", d_shflags[k].macro);
+      }
     }
     fprintf(fobj, " */\n");
 
@@ -243,7 +250,7 @@ int dump_symtab(ElfFile* AccessFile){
     fprintf(fobj, "  /* ENTRY #%d */\n", i);
     fprintf(fobj, "  {\n");
 
-    _SnPRINT(fobj, "st_name", PRIu32, AccessFile->symtab[i].st_name, "OFFSET in .strtab, interpreted as");
+    _SnPRINT(fobj, "st_name", PRIu32, AccessFile->symtab[i].st_name, "OFFSET in .strtab");
     char* temp = AccessFile->r_strtab;
     temp += AccessFile->symtab[i].st_name;
     fprintf(fobj, "[%s] */\n", temp);
@@ -293,7 +300,7 @@ int dump_dynsym(ElfFile* AccessFile){
     fprintf(fobj, "  /* ENTRY #%d */\n", i);
     fprintf(fobj, "  {\n");
 
-    _SnPRINT(fobj, "st_name", PRIu32, AccessFile->dynsym[i].st_name, "OFFSET in .strtab, interpreted as");
+    _SnPRINT(fobj, "st_name", PRIu32, AccessFile->dynsym[i].st_name, "OFFSET in .strtab");
     char* temp = AccessFile->r_strtab;
     temp += AccessFile->dynsym[i].st_name;
     fprintf(fobj, "[%s] */\n", temp);
@@ -344,7 +351,7 @@ int dump_reladyn(ElfFile* AccessFile){
     fprintf(fobj, "  /* Entry #%d && Symbol: [%s] */\n", i, temp);
     fprintf(fobj, "  {\n");
     
-    _RPRINT(fobj, "r_offset",    PRIu64, AccessFile->reladyn[i].r_offset, "OFFSET to apply relocation at");
+    _RPRINT(fobj, "r_offset",    PRIu64, AccessFile->reladyn[i].r_offset, "OFFSET to apply the relocation at");
 
     for (int j = 0; j < 40; j++){
       if ((AccessFile->reladyn[i].r_info & 0xffffffff) == rtypes[j].value){
@@ -378,7 +385,7 @@ int dump_relaplt(ElfFile* AccessFile){
     fprintf(fobj, "  /* Entry #%d && Symbol: [%s] */\n", i, temp);
     fprintf(fobj, "  {\n");
 
-    _RPRINT(fobj, "r_offset",    PRIu64, AccessFile->relaplt[i].r_offset, "OFFSET to apply relocation at");
+    _RPRINT(fobj, "r_offset",    PRIu64, AccessFile->relaplt[i].r_offset, "OFFSET to apply the relocation at");
 
     for (int j = 0; j < 40; j++){
       if ((AccessFile->relaplt[i].r_info & 0xffffffff) == rtypes[j].value){
