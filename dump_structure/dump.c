@@ -246,39 +246,72 @@ int dump_symtab(ElfFile* AccessFile){
   fprintf(fobj, "Elf64_Sym symtab = {\n");
 
   for (int i = 0; i < AccessFile->symtab_count; i++){
-    fprintf(fobj, "  /* ENTRY #%d */\n", i);
+    fprintf(fobj, "  /* ENTRY #%d %s*/\n", i, (i == 0) ? ": STN_UNDEF " : "");
     fprintf(fobj, "  {\n");
 
-    _SnPRINT(fobj, "st_name", PRIu32, AccessFile->symtab[i].st_name, "OFFSET in .strtab");
-    char* temp = AccessFile->r_strtab;
-    temp += AccessFile->symtab[i].st_name;
-    fprintf(fobj, "[%s] */\n", temp);
-
-    for (struct Mapp* types = d_sttypes; types->macro != NULL; types++){
-      if ((AccessFile->symtab[i].st_info & 0xf) == types->value){
-        _SPRINT(fobj, "st_info.type", "d", AccessFile->symtab[i].st_info & 0xf, types->macro);
-        break;
-      }
+    if (i == 0){
+      _SPRINT(fobj, "st_name",  PRIu32,  AccessFile->symtab[i].st_name,       "No name");
+      _SPRINT(fobj, "st_info.type", "d", AccessFile->symtab[i].st_info & 0xf, "No type");
+      _SPRINT(fobj, "st_info.bind", "d", AccessFile->symtab[i].st_info & 0xf, "STB_LOCAL");
+      _SPRINT(fobj, "st_other",     "d", AccessFile->symtab[i].st_info >> 4,  "STV_DEFAULT");
+      _SPRINT(fobj, "st_shdx",  PRIu16,  AccessFile->symtab[i].st_shndx,      "[STN_UNDEF]: No section");
+      _SPRINT(fobj, "st_value", PRIu64,  AccessFile->symtab[i].st_value,      "No value");
+      _SPRINT(fobj, "st_size",  PRIu64,  AccessFile->symtab[i].st_size,       "No size");
     }
 
-    for (struct Mapp* bind = d_stbinds; bind->macro; bind++){
-      if ((AccessFile->symtab[i].st_info >> 4) == bind->value){
-        _SPRINT(fobj, "st_info.bind", "d", AccessFile->symtab[i].st_info >> 4, bind->macro);
-        break;
-      }
-    }
+    else{
+      _SnPRINT(fobj, "st_name", PRIu32, AccessFile->symtab[i].st_name, "OFFSET in .strtab");
+      char* temp = AccessFile->r_strtab;
+      temp += AccessFile->symtab[i].st_name;
+      fprintf(fobj, "[%s] */\n", temp);
 
-    for (struct Mapp* vis = d_stvisible; vis->macro != NULL; vis++){
-      if ((AccessFile->symtab[i].st_other & 0x03) == vis->value){
-        _SPRINT(fobj, "st_other",     "d", AccessFile->symtab[i].st_other, vis->macro);
-        break;
+      for (struct Mapp3* types = d_sttypes; types->macro != NULL; types++){
+        if ((AccessFile->symtab[i].st_info & 0xf) == types->value){
+          _SPRINT(fobj, "st_info.type", "d", AccessFile->symtab[i].st_info & 0xf, types->macro);
+          break;
+        }
       }
-    }
 
-    _SPRINT(fobj, "st_shdx",  PRIu16, AccessFile->symtab[i].st_shndx, "Section (Idx) the symbol is present in");
-    _SPRINT(fobj, "st_value", PRIu64, AccessFile->symtab[i].st_value, "Symbol value");
-    _SPRINT(fobj, "st_size",  PRIu64, AccessFile->symtab[i].st_size,  "Symbol size");
-    fprintf(fobj, "  },\n");
+      for (struct Mapp* bind = d_stbinds; bind->macro; bind++){
+        if ((AccessFile->symtab[i].st_info >> 4) == bind->value){
+          _SPRINT(fobj, "st_info.bind", "d", AccessFile->symtab[i].st_info >> 4, bind->macro);
+          break;
+        }
+      }
+
+      for (struct Mapp* vis = d_stvisible; vis->macro != NULL; vis++){
+        if ((AccessFile->symtab[i].st_other & 0x03) == vis->value){
+          _SPRINT(fobj, "st_other",     "d", AccessFile->symtab[i].st_other, vis->macro);
+          break;
+        }
+      }
+
+      // printf("%d\n", AccessFile->symtab[i].st_shndx);
+      
+      switch(AccessFile->symtab[i].st_value){
+        case SHN_UNDEF:
+          _SPRINT(fobj, "st_shdx",  PRIu16, AccessFile->symtab[i].st_shndx, "[SHN_UNDEF]: The symbol is undefined; needs relocation");
+          break;
+        case SHN_ABS:
+          _SPRINT(fobj, "st_shdx",  PRIu16, AccessFile->symtab[i].st_shndx, "[SHN_ABS]: The symbol has an absolute value and will not change on relocation");
+          break;
+        case SHN_COMMON:
+          _SPRINT(fobj, "st_shdx",  PRIu16, AccessFile->symtab[i].st_shndx, "[SHN_COMMON]: The symbol labels a common block which hasn't been allocated yet");
+          break;
+        default:
+          _SnPRINT(fobj, "st_shdx",  PRIu16, AccessFile->symtab[i].st_shndx, (i == 0) ? "No section" : "Section (Idx) the symbol is present in");
+          char* temp2 = AccessFile->r_shstrtab;
+          temp2 += AccessFile->shdrs[AccessFile->symtab[i].st_shndx].sh_name;
+          fprintf(fobj, "[%s] */\n", temp2);
+      }
+
+      for (struct Mapp3* types = d_sttypes; types->macro != NULL; types++){
+        if (AccessFile->symtab[i].st_value == types->value) _SPRINT(fobj, "st_value", PRIu64, AccessFile->symtab[i].st_value, types->desc);
+      }
+
+      _SPRINT(fobj, "st_size",  PRIu64, AccessFile->symtab[i].st_size, "Symbol size");
+      fprintf(fobj, "  },\n");
+    }
   }
   fprintf(fobj, "};\n\n");
 
@@ -299,12 +332,12 @@ int dump_dynsym(ElfFile* AccessFile){
     fprintf(fobj, "  /* ENTRY #%d */\n", i);
     fprintf(fobj, "  {\n");
 
-    _SnPRINT(fobj, "st_name", PRIu32, AccessFile->dynsym[i].st_name, "OFFSET in .strtab");
-    char* temp = AccessFile->r_strtab;
+    _SnPRINT(fobj, "st_name", PRIu32, AccessFile->dynsym[i].st_name, "OFFSET in .dynstr");
+    char* temp = AccessFile->r_dynstr;
     temp += AccessFile->dynsym[i].st_name;
     fprintf(fobj, "[%s] */\n", temp);
 
-    for (struct Mapp* types = d_sttypes; types->macro != NULL; types++){
+    for (struct Mapp3* types = d_sttypes; types->macro != NULL; types++){
       if ((AccessFile->dynsym[i].st_info & 0xf) == types->value){
         _SPRINT(fobj, "st_info.type", "d", AccessFile->dynsym[i].st_info & 0xf, types->macro);
         break;

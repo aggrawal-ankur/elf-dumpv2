@@ -8,6 +8,12 @@ struct Mapp {
   const char *macro;
 };
 
+struct Mapp3 {
+  uint64_t value;
+  const char* macro;
+  const char* desc;
+};
+
 extern struct Mapp d_ehtypes[];
 extern struct Mapp d_class[];
 extern struct Mapp ei_data[];
@@ -16,10 +22,10 @@ extern struct Mapp d_phtypes[];
 extern struct Mapp d_phflags[];
 extern struct Mapp d_shtypes[];
 extern struct Mapp d_shflags[];
-extern struct Mapp d_sttypes[];
 extern struct Mapp d_stbinds[];
 extern struct Mapp d_stvisible[];
 extern struct Mapp rtypes[];
+extern struct Mapp3 d_sttypes[];
 
 struct DTypes {
   uint64_t value;

@@ -131,17 +131,17 @@ struct Mapp d_shflags[] = {
   {-1, NULL}
 };
 
-struct Mapp d_sttypes[] = {
-  {0, "STT_NOTYPE"},
-  {1, "STT_OBJECT"},
-  {2, "STT_FUNC"},
-  {3, "STT_SECTION"},
-  {4, "STT_FILE"},
-  {5, "STT_COMMON"},
-  {6, "STT_TLS"},
-  {13, "LOPROC"},
-  {15, "HIPROC"},
-  {-1, NULL},
+struct Mapp3 d_sttypes[] = {
+  {0, "STT_NOTYPE",  "Symbol Association: Not specified"},
+  {1, "STT_OBJECT",  "Symbol Association: A data object (variable/array/etc)"},
+  {2, "STT_FUNC",    "Symbol Association: A function or other executable code"},
+  {3, "STT_SECTION", "Symbol Association: A section"},
+  {4, "STT_FILE",    "Symbol Association: A file"},
+  {5, "STT_COMMON",  "Symbol Association: NEEDS TO BE WRITTEN"},
+  {6, "STT_TLS",     "Symbol Association: NEEDS TO BE WRITTEN"},
+  {13, "STT_LOPROC", "Start of processor-specific"},
+  {15, "STT_HIPROC", "End of processor-specific"},
+  {-1, NULL, NULL},
 };
 
 struct Mapp d_stbinds[] = {
