@@ -15,7 +15,7 @@
 #define _cPRINT(fo, name, fmt, value, comment) fprintf(fo, "  %-14s = %-10" fmt ",  /* [%s] */\n", name, value, comment)
 
 /* Macros for shdrs */
-#define _PRINT(fo, name, fmt, value, comment)  fprintf(fo, "%-18s = %-10" fmt ",  %s\n", name, value, comment)
+#define _PRINT(fo, name, fmt, value, comment)  fprintf(fo, "%-18s = %-10" fmt ",  /* %s */\n", name, value, comment)
 #define _iPRINT(fo, name, fmt, value, comment) fprintf(fo, "%-18s = %-10" fmt ",  /* [%s] */\n", name, value, comment)
 #define _fPRINT(fo, name, fmt, value, comment) fprintf(fo, "%-18s = %-10" fmt ",  %s ", name, value, comment)
 #define _sPRINT(fo, name, fmt, value, comment, off) fprintf(fo, "%-18s = %-10" fmt ",  %s %s", name, value, comment, off)

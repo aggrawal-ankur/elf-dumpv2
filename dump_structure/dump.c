@@ -89,6 +89,7 @@ int dump_phdrs(ElfFile* AccessFile){
   }
 
   fprintf(fobj, "Elf64_Phdr phdrs = {\n");
+  fprintf(fobj, "  /* Total Count #%d */\n", AccessFile->ehdr->e_phnum);
 
   for (int i = 0; i < AccessFile->ehdr->e_phnum; i++){
     fprintf(fobj, "  /* Program Header #%d */\n", i);
@@ -130,43 +131,57 @@ int dump_shdrs(ElfFile* AccessFile){
   }
 
   fprintf(fobj, "Elf64_Shdr shdrs = {\n");
+  fprintf(fobj, "  /* Total Count #%d */\n", AccessFile->ehdr->e_shnum);
 
   for (int i = 0; i < AccessFile->ehdr->e_shnum; i++){
     fprintf(fobj, "  /* Section Header #%d */\n", i);
     fprintf(fobj, "  {\n");
 
-    _fPRINT(fobj, "    sh_name", PRIu32, AccessFile->shdrs[i].sh_name, "/* OFFSET in .shstrtab");
-    if (i == 0) fprintf(fobj, "[SHT_NULL] */\n");
+    if (i == 0){
+      _PRINT(fobj, "    sh_name",      "d", (0), "No name");
+      _PRINT(fobj, "    sh_type",      "d", (0), "SHT_NULL");
+      _PRINT(fobj, "    sh_flags",     "d", (0), "No flags");
+      _PRINT(fobj, "    sh_addr",      "d", (0), "No Address");
+      _PRINT(fobj, "    sh_offset",    "d", (0), "No file offset");
+      _PRINT(fobj, "    sh_size",      "d", (0), "No size");
+      _PRINT(fobj, "    sh_link",      "d", (0), "[SHN_UNDEF]: No link information");
+      _PRINT(fobj, "    sh_info",      "d", (0), "No auxiliary information");
+      _PRINT(fobj, "    sh_addralign", "d", (0), "No alignment requirement");
+      _PRINT(fobj, "    sh_entsize",   "d", (0), "No entries");
+    }
+
     else{
+
+      _fPRINT(fobj, "    sh_name", PRIu32, AccessFile->shdrs[i].sh_name, "/* OFFSET in .shstrtab");
       char* temp = AccessFile->r_shstrtab;
       temp += AccessFile->shdrs[i].sh_name;
       fprintf(fobj, "[%s] */\n", temp);
-    }
 
-    for (struct Mapp* types = d_shtypes; types->macro != NULL; types++){
-      if (AccessFile->shdrs[i].sh_type == types->value){
-        _iPRINT(fobj, "    sh_type", PRIu32, AccessFile->shdrs[i].sh_type, types->macro);
-        break;
+      for (struct Mapp* types = d_shtypes; types->macro != NULL; types++){
+        if (AccessFile->shdrs[i].sh_type == types->value){
+          _iPRINT(fobj, "    sh_type", PRIu32, AccessFile->shdrs[i].sh_type, types->macro);
+          break;
+        }
       }
-    }
-
-    _fPRINT(fobj, "    sh_flags", PRIu64, AccessFile->shdrs[i].sh_flags, "/* BIT-MASKED value, interpreted as");
-    if (i == 0) fprintf(fobj, "[NO_FLAGS]");
-    else {
-      for (struct Mapp* flags = d_shflags; flags->macro != NULL; flags++){
-        if (AccessFile->shdrs[i].sh_flags & flags->value) fprintf(fobj, "[%s], ", flags->macro);
+      
+      _fPRINT(fobj, "    sh_flags", PRIu64, AccessFile->shdrs[i].sh_flags, "/* BIT-MASKED value, interpreted as");
+      if (i == 0) fprintf(fobj, "[NO_FLAGS]");
+      else {
+        for (struct Mapp* flags = d_shflags; flags->macro != NULL; flags++){
+          if (AccessFile->shdrs[i].sh_flags & flags->value) fprintf(fobj, "[%s], ", flags->macro);
+        }
       }
+      fprintf(fobj, " */\n");
+      
+      _PRINT(fobj, "    sh_addr",      PRIu64, AccessFile->shdrs[i].sh_addr,      "Virtual Address of this section entry");
+      _PRINT(fobj, "    sh_offset",    PRIu64, AccessFile->shdrs[i].sh_offset,    "OFFSET in the file this section entry starts from");
+      _PRINT(fobj, "    sh_size",      PRIu64, AccessFile->shdrs[i].sh_size,      "Size of this section (in bytes)");
+      _PRINT(fobj, "    sh_link",      PRIu32, AccessFile->shdrs[i].sh_link,      "Link informat");
+      _PRINT(fobj, "    sh_info",      PRIu32, AccessFile->shdrs[i].sh_info,      "Auxiliary informat");
+      _PRINT(fobj, "    sh_addralign", PRIu64, AccessFile->shdrs[i].sh_addralign, "Section alignment requirement");
+      _PRINT(fobj, "    sh_entsize",   PRIu64, AccessFile->shdrs[i].sh_entsize,   "The section has fixed size entries of this size (in bytes)");
+      
     }
-    fprintf(fobj, " */\n");
-
-    _PRINT(fobj, "    sh_addr",      PRIu64, AccessFile->shdrs[i].sh_addr,      "/* Virtual Address of this section entry */");
-    _PRINT(fobj, "    sh_offset",    PRIu64, AccessFile->shdrs[i].sh_offset,    "/* OFFSET in the file this section entry starts from */");
-    _PRINT(fobj, "    sh_size",      PRIu64, AccessFile->shdrs[i].sh_size,      "/* Size of this section (in bytes) */");
-    _PRINT(fobj, "    sh_link",      PRIu32, AccessFile->shdrs[i].sh_link,      "");
-    _PRINT(fobj, "    sh_info",      PRIu32, AccessFile->shdrs[i].sh_info,      "");
-    _PRINT(fobj, "    sh_addralign", PRIu64, AccessFile->shdrs[i].sh_addralign, "/* Section alignment requirement */");
-    _PRINT(fobj, "    sh_entsize",   PRIu64, AccessFile->shdrs[i].sh_entsize,   "/* The section has fixed size entries of this size (in bytes) */");
-
     fprintf(fobj, "  },\n");
   }
   fprintf(fobj, "};\n\n");
@@ -225,6 +240,7 @@ int dump_strtab(ElfFile* AccessFile){
   fprintf(fobj, "\n};\n\n");
 
   fprintf(fobj, "/* String table (.strtab) formatted-dump. */\n");
+  fprintf(fobj, "/* Total Count #%d */\n", AccessFile->f_str_count);
   fprintf(fobj, "char** f_strtab = {\n");
 
   for (int i = 0; i < AccessFile->f_str_count; i++){
@@ -244,6 +260,7 @@ int dump_symtab(ElfFile* AccessFile){
   }
 
   fprintf(fobj, "Elf64_Sym symtab = {\n");
+  fprintf(fobj, "  /* Total Count #%d */\n", AccessFile->symtab_count);
 
   for (int i = 0; i < AccessFile->symtab_count; i++){
     fprintf(fobj, "  /* ENTRY #%d %s*/\n", i, (i == 0) ? ": STN_UNDEF " : "");
@@ -325,6 +342,7 @@ int dump_dynsym(ElfFile* AccessFile){
   }
 
   fprintf(fobj, "Elf64_Sym dynsym = {\n");
+  fprintf(fobj, "  /* Total Count #%d */\n", AccessFile->dynsym_count);
 
   for (int i = 0; i < AccessFile->dynsym_count; i++){
     fprintf(fobj, "  /* ENTRY #%d %s*/\n", i, (i == 0) ? ": STN_UNDEF " : "");
@@ -406,6 +424,7 @@ int dump_reladyn(ElfFile* AccessFile){
   }
 
   fprintf(fobj, "Elf64_Rela rela_dyn = {\n");
+  fprintf(fobj, "  /* Total Count #%d */\n", AccessFile->reladyn_count);
 
   for (int i = 0; i < AccessFile->reladyn_count; i++){
     char* temp = AccessFile->r_strtab;
@@ -442,6 +461,7 @@ int dump_relaplt(ElfFile* AccessFile){
   }
 
   fprintf(fobj, "Elf64_Rela rela_plt = {\n");
+  fprintf(fobj, "  /* Total Count #%d */\n", AccessFile->relaplt_count);
 
   for (int i = 0; i < AccessFile->relaplt_count; i++){
     char* temp = AccessFile->r_strtab;
@@ -502,6 +522,7 @@ int dump_dynstr(ElfFile* AccessFile){
   fprintf(fobj, "\n};\n\n");
 
   fprintf(fobj, "/* Dynamic String Table (.dynstr) formatted-dump. */\n");
+  fprintf(fobj, "/* Total Count #%d */\n", AccessFile->f_dstr_count);
   fprintf(fobj, "char** f_dynstr = {\n");
 
   for (int i = 0; i < AccessFile->f_dstr_count; i++){
@@ -521,6 +542,7 @@ int dump_dynamic(ElfFile* AccessFile){
   }
 
   fprintf(fobj, "Elf64_Dyn dynamic = {\n");
+  fprintf(fobj, "  /* Total Count #%d */\n", AccessFile->dyn_ent.logical_count);
 
   for (int i = 0; i < AccessFile->dyn_ent.logical_count; i++){
     fprintf(fobj, "  /* Dynamic Array Tag #%d */\n", i);
