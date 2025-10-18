@@ -590,7 +590,16 @@ int parse_dynamic(FILE* f_obj, ElfFile* AccessFile){
     AccessFile->dynamic = NULL;
     return -1;
   }
-  AccessFile->dyn_ent = nEnt;
+  AccessFile->dyn_ent.raw_count = size/entSize;
+
+  for (int i = 0; i < nEnt; i++){
+    if (AccessFile->dynamic[i].d_tag == DT_NULL){
+      AccessFile->dyn_ent.logical_count = ++i;
+      break;
+    }
+  }
+  printf("%d\n", AccessFile->dyn_ent.raw_count);
+  printf("%d\n", AccessFile->dyn_ent.logical_count);
 
   return 0;
 }

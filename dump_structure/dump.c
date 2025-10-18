@@ -427,7 +427,7 @@ int dump_dynamic(ElfFile* AccessFile){
 
   fprintf(fobj, "Elf64_Dyn dynamic = {\n");
 
-  for (int i = 0; i < AccessFile->dyn_ent; i++){
+  for (int i = 0; i < AccessFile->dyn_ent.logical_count; i++){
     fprintf(fobj, "  /* Dynamic Array Tag #%d */\n", i);
     fprintf(fobj, "  {\n");
 
@@ -442,6 +442,8 @@ int dump_dynamic(ElfFile* AccessFile){
     _D2PRINT(fobj, tag->d_un, PRIu64, AccessFile->dynamic[i].d_un.d_val, tag->interp);
 
     fprintf(fobj, "  },\n");
+
+    if (AccessFile->dynamic[i].d_tag == DT_NULL) break;
   }
   fprintf(fobj, "};\n\n");
 

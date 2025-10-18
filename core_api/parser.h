@@ -42,7 +42,10 @@ typedef struct {
   int f_dstr_count;         // └─ count of total individual entries
 
   Elf64_Dyn* dynamic;       // Dynamic Section
-  int dyn_ent;              // └─ entry count
+  struct {
+    int raw_count;
+    int logical_count;
+  } dyn_ent;
 } ElfFile;
 
 int verify_elf(FILE* f_obj);
