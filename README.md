@@ -1,6 +1,8 @@
 # An ELF Parser
 
-An ELF parser and C-style dumper
+A TISv1.2 and SystemV gABI v1.2 compliant ELF parser and C-style dumper.
+
+***Caution: Project is under active development.***
 
 To run the project,
 ```bash
@@ -23,3 +25,4 @@ gcc main.c core_api/parser.c dump_structure/dump.c dump_structure/mappings.c -o 
 6. Selective parsing and dumping based on flags.
 7. Writing output to terminal as well.
 8. Error management.
+9. Support for v4.1 SysV ABI and psABI AMD64
