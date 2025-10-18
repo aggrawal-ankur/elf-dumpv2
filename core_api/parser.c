@@ -598,8 +598,6 @@ int parse_dynamic(FILE* f_obj, ElfFile* AccessFile){
       break;
     }
   }
-  printf("%d\n", AccessFile->dyn_ent.raw_count);
-  printf("%d\n", AccessFile->dyn_ent.logical_count);
 
   return 0;
 }

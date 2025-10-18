@@ -330,7 +330,7 @@ int dump_dynsym(ElfFile* AccessFile){
   return 0;
 }
 
-int dump_relocations(ElfFile* AccessFile){
+int dump_reladyn(ElfFile* AccessFile){
   FILE* fobj = fopen("./output/cdump.c", "a");
   if (!fobj){
     fprintf(stderr, "Error: `fobj` failed.\n  Inside `dump_relocations`\n");
@@ -343,7 +343,7 @@ int dump_relocations(ElfFile* AccessFile){
     temp += AccessFile->symtab[AccessFile->reladyn[i].r_info >> 32].st_name;
     fprintf(fobj, "  /* Entry #%d && Symbol: [%s] */\n", i, temp);
     fprintf(fobj, "  {\n");
-
+    
     _RPRINT(fobj, "r_offset",    PRIu64, AccessFile->reladyn[i].r_offset, "OFFSET to apply relocation at");
 
     for (int j = 0; j < 40; j++){
@@ -357,9 +357,20 @@ int dump_relocations(ElfFile* AccessFile){
     _RPRINT(fobj, "r_addend",    PRIi64, AccessFile->reladyn[i].r_addend, "Constant to be added to calculate the final value");
     fprintf(fobj, "  },\n");
   }
-
+  
   fprintf(fobj, "};\n\n");
+  
+  fclose(fobj);
+  return 0;
+}
 
+int dump_relaplt(ElfFile* AccessFile){
+  FILE* fobj = fopen("./output/cdump.c", "a");
+  if (!fobj){
+    fprintf(stderr, "Error: `fobj` failed.\n  Inside `dump_relocations`\n");
+    return -1;
+  }
+  
   fprintf(fobj, "Elf64_Rela rela_plt = {\n");
   for (int i = 0; i < AccessFile->relaplt_count; i++){
     char* temp = AccessFile->r_strtab;
@@ -384,6 +395,18 @@ int dump_relocations(ElfFile* AccessFile){
   fprintf(fobj, "};\n\n");
 
   fclose(fobj);
+  return 0;
+}
+
+int dump_relocations(ElfFile* AccessFile){
+  if (dump_reladyn(AccessFile) != 0){
+    fprintf(stderr, "Error: dump_reladyn");
+    return 1;
+  }
+  if (dump_relaplt(AccessFile) != 0){
+    fprintf(stderr, "Error: dump_relaplt");
+    return 1;
+  }
   return 0;
 }
 
@@ -487,6 +510,3 @@ int dump_all(ElfFile* AccessFile){
   }
   return 0;
 }
-
-int dump_reladyn(ElfFile* AccessFile){return 0;}
-int dump_relaplt(ElfFile* AccessFile){return 0;}

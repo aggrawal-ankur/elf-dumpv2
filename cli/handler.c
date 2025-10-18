@@ -21,6 +21,8 @@ TargetSpec dump_targets[] = {
   {"dynstr", dump_dynstr, "Dump string table for dynamic symbol table.\n"},
   {"dynamic", dump_dynamic, "Dump dynamic section.\n"},
   {"relocations", dump_relocations, "Dump all relocation entries.\n"},
+  {"reladyn", dump_reladyn, "Dump .rela.dyn relocation entries."},
+  {"relaplt", dump_relaplt, "Dump .rela.plt relocation entries."},
   {"reladyn", dump_reladyn, "Dump .rela.dyn relocation entries.\n"},
   {"relaplt", dump_relaplt, "Dump .rela.plt relocation entries.\n"},
 };
