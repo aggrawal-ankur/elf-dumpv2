@@ -10,7 +10,7 @@ git clone https://github.com/hi-anki/elf-dump.git
 
 cd ./elf-dump
 
-gcc main.c core_api/parser.c dump_structure/dump.c dump_structure/mappings.c -o elfdump
+gcc main.c core_api/parser.c dump_structure/dump.c dump_structure/mappings.c cli/handler.c -o elfdump -Wall -Werror
 
 ./elfdump <ELF_FILE>
 ```
